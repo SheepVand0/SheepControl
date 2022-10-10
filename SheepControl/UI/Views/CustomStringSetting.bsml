@@ -1,0 +1,7 @@
+﻿<horizontal bg="round-rect-panel" id="HorizontalLayout" min-width="70" pad-left='2' pad-right='2'>
+	<vertical size-delta-x="50" min-width="50">
+		<text text="Default Text" id="TextValuePreview" align="Left" size-delta-x="200"/>
+	</vertical>
+	<vertical id="EditButtonTransform" size-delta-x="10" min-width="10">
+	</vertical>
+</horizontal>

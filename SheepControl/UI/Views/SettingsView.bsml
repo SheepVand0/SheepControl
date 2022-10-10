@@ -1,0 +1,117 @@
+﻿<vertical child-control-height='false'>
+	<horizontal bg='panel-top' pad-left='15' pad-right='15' horizontal-fit='PreferredSize'>
+		<text text='Bobby' align='Center' font-size='4.2'/>
+	</horizontal>
+
+	<horizontal child-align='MiddleLeft' anchor-pos-x='-5' id='Tabs' spacing='0' pad-top='0' min-width='145'>
+
+		<vertical spacing='0' pad-top='0'>
+
+			<horizontal id='TabSelector' anchor-pos-x='-5' pad-top='2' pref-height='7' pad-left='8' pad-right='8' min-width='145'>
+			</horizontal>
+
+			<horizontal pref-height='2'></horizontal>
+
+			<horizontal id='WhitelistTab' min-height='65' spacing='0' pad='0'>
+				<vertical>
+					<vertical spacing='15' vertical-fit='PreferredSize' child-control-height='true'>
+						<div id='wlistdiv'></div>
+						<custom-list id='WhiteListList' size-delta-x="125" pref-width="125" contents='WhiteList' show-scrollbar='true' pref-height="40"  cell-size="10">
+							<horizontal horizontal-fit="PreferredSize">
+								<horizontal id="StrSettingHorizontal"></horizontal>
+								<button text='-' on-click='delete'/>
+							</horizontal>
+						</custom-list>
+						<horizontal pref-height='15'/>
+					</vertical>
+				</vertical>
+			</horizontal>
+
+
+			<horizontal id='BadWordsTab'>
+				<vertical>
+					<vertical spacing='15' vertical-fit='PreferredSize'>
+						<div id='bwordsdiv'></div>
+						<custom-list id='BadWordsListList' contents='BadWords' pref-width="125" size-delta-x="125" show-scrollbar='true' pref-height="40"  cell-size="10">
+							<horizontal horizontal-fit="PreferredSize">
+								<horizontal id="StrSettingHorizontal"></horizontal>
+								<button text='-' on-click='delete'/>
+							</horizontal>
+						</custom-list>
+						<horizontal pref-height='15'/>
+					</vertical>
+				</vertical>
+			</horizontal>
+
+
+			<horizontal id='BannedCommandsTab'>
+				<vertical>
+					<vertical spacing='15' vertical-fit='PreferredSize'>
+						<div id='bcommandsdiv'></div>
+						<custom-list id='BannedCommandsList' contents='BannedCommands' pref-width="125" size-delta-x="125" show-scrollbar='true' pref-height="40"  cell-size="10">
+							<horizontal horizontal-fit="PreferredSize">
+								<horizontal id="StrSettingHorizontal"></horizontal>
+								<button text='-' on-click='delete'/>
+							</horizontal>
+						</custom-list>
+						<horizontal pref-height='15'/>
+					</vertical>
+				</vertical>
+			</horizontal>
+
+
+			<horizontal id='BannedQueriesTab'>
+				<vertical>
+					<vertical spacing='15' vertical-fit='PreferredSize'>
+						<div id='bqueriesdiv'></div>
+						<custom-list id='BannedQueriesList' contents='BannedQueriesContent' pref-width="125" size-delta-x="125" show-scrollbar='true' pref-height="40"  cell-size="10">
+							<horizontal horizontal-fit="PreferredSize">
+								<horizontal id="StrSettingHorizontal"></horizontal>
+								<button text='-' on-click='delete'/>
+							</horizontal>
+						</custom-list>
+						<horizontal pref-height='15'/>
+					</vertical>
+				</vertical>
+			</horizontal>
+
+
+			<horizontal id='OtherTab'>
+				<vertical>
+					<text text='Enable bobby IA : ' font-size='3.5' color='yellow'></text>
+					<bool-setting id='BobbyRandomMoves'></bool-setting>
+
+					<text text='Bobby IA Move duration : ' font-size='3.5' color='yellow'></text>
+					<slider-setting id='bobbymduration' show-buttons='true' increment='0.1' min='0.1' max='10'/>
+
+					<text text='Bobby IA Steal Duration : ' font-size='3.5' color='yellow' ></text>
+					<slider-setting id='bobbysduration' show-buttons='true' increment='0.1' min='0.1' max='10'/>
+
+					<text text='Bobby IA Turn Duration : ' font-size='3.5' color='yellow'></text>
+					<slider-setting id='bobbytduration' show-buttons='true' increment='0.1' min='0.1' max='10'/>
+
+					<horizontal>
+						<vertical>
+							<text text='Ask for commands : ' font-size='3.5' color='yellow'></text>
+							<bool-setting id='AskCommands'></bool-setting>
+						</vertical>
+						<vertical>
+							<text text='Is command enabled : ' font-size='3.5' color='yellow'></text>
+							<text text=' (By default) ' font-size='3.5' color='yellow'></text>
+							<bool-setting id='InGameCommandsEnabled'></bool-setting>
+						</vertical>
+					</horizontal>
+					<horizontal pref-height='20'/>
+				</vertical>
+			</horizontal>
+
+
+			<horizontal id='QuickActionsTab'>
+				<vertical>
+					<vertical id='QuickActionsTransform' spacing='1' vertical-fit='PreferredSize' />
+					<horizontal pref-height='42.5'/>
+				</vertical>
+			</horizontal>
+		</vertical>
+	</horizontal>
+</vertical>
