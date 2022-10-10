@@ -1,6 +1,7 @@
 ﻿using SheepControl.AnimsUtils;
 using SheepControl.Trucs;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -63,5 +64,18 @@ namespace SheepControl.TUtils
             return l_lastGM;
         }
 
+        private static IEnumerator Delay(IEnumerator p_Coroutine, float p_Seconds)
+        {
+            yield return new WaitForSeconds(p_Seconds);
+
+            SheepControlController.Instance.StartCoroutine(p_Coroutine);
+
+            yield return null;
+        }
+
+        public static Coroutine StartCoroutineWithDelay(IEnumerator p_Coroutine, float p_Seconds)
+        {
+            return SheepControlController.Instance.StartCoroutine(Delay(p_Coroutine, p_Seconds));
+        }
     }
 }

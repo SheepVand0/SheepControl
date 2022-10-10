@@ -3,7 +3,7 @@
 		<text text='Bobby' align='Center' font-size='4.2'/>
 	</horizontal>
 
-	<horizontal child-align='MiddleLeft' anchor-pos-x='-5' id='Tabs' spacing='0' pad-top='0' min-width='145'>
+	<horizontal child-align='MiddleLeft' anchor-pos-x='-5' id='Tabs' bg='round-rect-panel' spacing='0' pad-top='0' min-width='145'>
 
 		<vertical spacing='0' pad-top='0'>
 
@@ -116,8 +116,10 @@
 			<horizontal id='Updates'>
 				<vertical>
 					<text text='Game restart required after mod update' underlined='true'/>
-					<text color='yellow' id='UpdateText' text='Update needed :' active='false'/>
-					<div id='ModDownloadButtonObject' />
+					<text color='yellow' id='UpdateText' text='No update needed'/>
+					<vertical id='ModDownloadButtonObject' />
+					<vertical id='ModUpdateButtonRefreshObject' />
+					<horizontal pref-height='58'/>
 				</vertical>
 			</horizontal>
 		</vertical>

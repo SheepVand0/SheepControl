@@ -52,23 +52,40 @@ namespace SheepControl
             yield return null;
         }
 
+        public static IEnumerator SetCustomTexts(string p_SongName, string p_SongAuthor)
+        {
+            m_LastSongName = p_SongName;
+            m_LastSongAuthor = p_SongAuthor;
+
+            m_LastSongText.text = m_LastSongName;
+            m_SongAuthorText.text = m_LastSongAuthor;
+
+            yield return null;
+        }
+
         public static void ShowForCommands(this PauseMenuManager p_PauseMenuManager)
         {
             PauseController l_PauseController = Resources.FindObjectsOfTypeAll<PauseController>().First();
             IGamePause l_GamePause = l_PauseController.GetField<IGamePause, PauseController>("_gamePause");
             BeatmapObjectManager l_ObjectsManager = l_PauseController.GetField<BeatmapObjectManager, PauseController>("_beatmapObjectManager");
 
+            LevelBar l_LevelBar = p_PauseMenuManager.GetField<LevelBar, PauseMenuManager>("_levelBar");
+            m_LastSongText = l_LevelBar.GetField<TextMeshProUGUI, LevelBar>("_songNameText");
+            m_SongAuthorText = l_LevelBar.GetField<TextMeshProUGUI, LevelBar>("_authorNameText");
+
+            if (!SConfig.GetStaticModSettings().AskForCommands)
+            {
+                SheepControlController.Instance.StartCoroutine(SetCustomTexts("Pausing is cheating", "Kuurama"));
+                return;
+            }
+
+            Resources.FindObjectsOfTypeAll<SheepControlController>().First().StartCoroutine(ChangePauseMenuTexts());
+
             l_PauseController.SetField("_paused", true);
             l_GamePause.Pause();
             p_PauseMenuManager.ShowMenu();
             l_ObjectsManager.HideAllBeatmapObjects(hide: true);
             l_ObjectsManager.PauseAllBeatmapObjects(pause: true);
-
-            LevelBar l_LevelBar = p_PauseMenuManager.GetField<LevelBar, PauseMenuManager>("_levelBar");
-            m_LastSongText = l_LevelBar.GetField<TextMeshProUGUI, LevelBar>("_songNameText");
-            m_SongAuthorText = l_LevelBar.GetField<TextMeshProUGUI, LevelBar>("_authorNameText");
-
-            Resources.FindObjectsOfTypeAll<SheepControlController>().First().StartCoroutine(ChangePauseMenuTexts());
 
             m_Binder = p_PauseMenuManager.GetField<ButtonBinder, PauseMenuManager>("_buttonBinder");
 
@@ -134,9 +151,10 @@ namespace SheepControl
             //GameScenesManager l_GameScenesManager = Resources.FindObjectsOfTypeAll<GameScenesManager>().First();
             //if (l_GameScenesManager.GetField<HashSet<string>, GameScenesManager>("_neverUnloadScenes").Contains("MenuCore")) return;
 
-            if (SConfig.GetStaticModSettings().AskForCommands == false) { CommandHandler.IsCommandEnabled = SConfig.GetStaticModSettings().IsCommandsEnabledInGame; return; }
+            if (SConfig.GetStaticModSettings().AskForCommands == false) { CommandHandler.IsCommandEnabled = SConfig.GetStaticModSettings().IsCommandsEnabledInGame; }
 
-            Resources.FindObjectsOfTypeAll<SheepControlController>().First().StartCoroutine(Resources.FindObjectsOfTypeAll<SheepControlController>().First().PauseSong());
+            if (SConfig.GetStaticModSettings().AskForCommands)
+                Resources.FindObjectsOfTypeAll<SheepControlController>().First().StartCoroutine(Resources.FindObjectsOfTypeAll<SheepControlController>().First().PauseSong());
 
             PauseMenuManager l_PauseMenuManager = Resources.FindObjectsOfTypeAll<PauseMenuManager>().First();
             l_PauseMenuManager.ShowForCommands();

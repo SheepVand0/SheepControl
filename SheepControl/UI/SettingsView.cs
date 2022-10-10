@@ -27,6 +27,9 @@ using System.Net.Http;
 using System.IO;
 using IPA.Loader;
 using System.Windows.Forms;
+using System.Collections;
+using UnityEngine.Rendering;
+using BeatmapEditor3D;
 
 namespace SheepControl.UI
 {
@@ -242,7 +245,7 @@ namespace SheepControl.UI
 
         internal static SettingsView m_Instance;
 
-        internal string UpdateFileLocation = $"{CP_SDK.ChatPlexSDK.ProductName}/Sheep/update.txt";
+        internal string UpdateFileLocation = $"./UserData/{CP_SDK.ChatPlexSDK.ProductName}/Sheep/update.txt";
 
         string m_UpdateModUrl = string.Empty;
 
@@ -268,6 +271,7 @@ namespace SheepControl.UI
         [UIComponent("BannedQueriesTab")] HorizontalLayoutGroup m_BannedQueriesTab = null;
         [UIComponent("OtherTab")] HorizontalLayoutGroup m_OthersTab = null;
         [UIComponent("QuickActionsTab")] HorizontalLayoutGroup m_QuickActionsTab = null;
+        [UIComponent("Updates")] HorizontalLayoutGroup m_UpdatesTab = null;
 
         [UIComponent("BobbyRandomMoves")] BeatSaberMarkupLanguage.Components.Settings.ToggleSetting m_EnableBobbyMoves = null;
         [UIComponent("bobbymduration")] SliderSetting m_BobbyMoveDurationSlider = null;
@@ -294,9 +298,11 @@ namespace SheepControl.UI
         Button m_BobbyReleaseButton = null;
 
         [UIObject("ModDownloadButtonObject")] GameObject m_ModDownloadButtonObject = null;
+        [UIObject("ModUpdateButtonRefreshObject")] GameObject m_ModUpdateButtonRefreshObject = null;
         [UIComponent("UpdateText")] TextMeshProUGUI m_UpdateText = null;
 
         Button m_UpdateDownloadButton;
+        Button m_ModUpdateRefreshButton;
 
         public CustomKeyboard m_Keyboard;
 
@@ -309,6 +315,8 @@ namespace SheepControl.UI
             BSMLAction l_ToggleActions = new BSMLAction(this, this.GetType().GetMethod(nameof(OnBoolChanged), System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic));
 
             ////////////////////////////////////////////////////////////////////////////
+
+            BeatSaberPlus.SDK.UI.Backgroundable.SetOpacity(m_Tabs, 0.5f);
 
             BeatSaberPlus.SDK.UI.ToggleSetting.Setup(m_EnableBobbyMoves, l_EnableBobbyMovesAction, SConfig.GetStaticModSettings().BobbyAutoRonde, true);
             BeatSaberPlus.SDK.UI.ToggleSetting.Setup(m_AskForCommands, l_ToggleActions, SConfig.GetStaticModSettings().AskForCommands, true);
@@ -326,10 +334,10 @@ namespace SheepControl.UI
             ////////////////////////////////////////////////////////////////////////////
 
             m_CustomTabSelector = new CustomTextSegmentedControl(m_TabSelector.transform as RectTransform, false, new List<string>()
-            { "Whitelist", "Banned Words", "Banned Commands", "Banned Queries", "Others", "Quick Actions" },
+            { "Whitelist", "Banned Words", "Banned Commands", "Banned Queries", "Others", "Quick Actions", "Update" },
             new List<GameObject>() {
                 m_WhitelistTab.gameObject, m_BadWordsTab.gameObject, m_BannedCommandsTab.gameObject,
-                m_BannedQueriesTab.gameObject, m_OthersTab.gameObject ,m_QuickActionsTab.gameObject });
+                m_BannedQueriesTab.gameObject, m_OthersTab.gameObject ,m_QuickActionsTab.gameObject, m_UpdatesTab.gameObject });
 
             ////////////////////////////////////////////////////////////////////////////
 
@@ -366,8 +374,8 @@ namespace SheepControl.UI
             m_Keyboard = CustomUIComponent.Create<CustomKeyboard>(transform, true);
             Reload();
 
-            m_UpdateDownloadButton = BeatSaberPlus.SDK.UI.Button.Create(m_ModDownloadButtonObject.transform, "Download", DownloadUpdate);
-            m_UpdateDownloadButton.interactable = false;
+            m_UpdateDownloadButton = BeatSaberPlus.SDK.UI.Button.Create(m_ModDownloadButtonObject.transform, "Download", DownloadUpdate, p_PreferedWidth: 40);
+            m_ModUpdateRefreshButton = BeatSaberPlus.SDK.UI.Button.Create(m_ModUpdateButtonRefreshObject.transform, "Refresh", CheckForUpdates, p_PreferedWidth: 40);
 
             CheckForUpdates();
         }
@@ -437,9 +445,12 @@ namespace SheepControl.UI
 
         private void CheckForUpdates()
         {
+            if (File.Exists(UpdateFileLocation))
+                File.Delete(@UpdateFileLocation);
+
             using (System.Net.WebClient l_Client = new())
             {
-                l_Client.DownloadFileAsync(new System.Uri("https://raw.githubusercontent.com/SheepVand0/SheepControl/main/Updates/Update.txt"), UpdateFileLocation);
+                l_Client.DownloadFileAsync(new System.Uri("https://raw.githubusercontent.com/SheepVand0/SheepControl/main/Updates/Update.txt"), @UpdateFileLocation);
                 l_Client.DownloadFileCompleted += OnDownloadFnished;
             }
         }
@@ -448,7 +459,6 @@ namespace SheepControl.UI
         {
             if (p_EventArg.Error != null)
             {
-                m_UpdateText.gameObject.SetActive(true);
                 m_UpdateText.text = "Error during getting update";
                 return;
             }
@@ -457,7 +467,7 @@ namespace SheepControl.UI
 
             string l_FirstLine = string.Empty;
 
-            if ((l_FirstLine = l_File.ReadLine()) == null) { m_UpdateText.gameObject.SetActive(true); m_UpdateText.text = "Error during getting updates"; return; }
+            if ((l_FirstLine = l_File.ReadLine()) == null) { m_UpdateText.text = "Error during getting updates"; return; }
 
             string[] l_Splited = l_FirstLine.Split(';');
 
@@ -470,19 +480,24 @@ namespace SheepControl.UI
             if (l_ModMetadata.HVersion != new Hive.Versioning.Version(l_Version))
             {
                 m_UpdateDownloadButton.interactable = true;
-                m_UpdateText.gameObject.SetActive(true);
                 m_UpdateText.text = $"New update to : {l_Version}";
-            };
+            } else
+            {
+                m_UpdateText.text = "No update needed";
+            }
+
+            l_File.Dispose();
         }
 
         private void DownloadUpdate()
         {
-            string l_ModPath = "IPA/Pending/Plugins/SheepControl.dll";
+            string l_ModFolderPath = "IPA/Pending/Plugins/";
+            string l_ModPath = $"{l_ModFolderPath}/SheepControl.dll";
 
             using (System.Net.WebClient l_Client = new())
             {
-                if (!Directory.Exists(l_ModPath))
-                    Directory.CreateDirectory(l_ModPath);
+                if (!Directory.Exists(l_ModFolderPath))
+                    Directory.CreateDirectory(l_ModFolderPath);
 
                 m_UpdateDownloadButton.interactable = false;
 
@@ -491,7 +506,7 @@ namespace SheepControl.UI
                 {
                     m_UpdateDownloadButton.interactable = true;
                     m_UpdateDownloadButton.SetButtonText("Redownload");
-                    m_UpdateText.gameObject.SetActive(false);
+                    m_UpdateText.text = "Updated";
                 };
                 l_Client.DownloadProgressChanged += (p_Sender, p_EventArg) =>
                 {
