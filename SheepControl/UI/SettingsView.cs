@@ -283,6 +283,10 @@ namespace SheepControl.UI
         Button m_ResetConfigButton = null;
         Button m_BobbyReleaseButton = null;
 
+        [UIObject("ModDownloadButtonObject")] GameObject m_ModDownloadButtonObject = null;
+
+        Button m_DownloadButton;
+
         public CustomKeyboard m_Keyboard;
 
         protected override sealed void OnViewCreation()

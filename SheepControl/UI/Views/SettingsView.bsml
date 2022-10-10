@@ -112,6 +112,14 @@
 					<horizontal pref-height='42.5'/>
 				</vertical>
 			</horizontal>
+
+			<horizontal id='Updates'>
+				<vertical>
+					<text text='Game restart required after mod update' underlined='true'/>
+					<text color='yellow' id='UpdateText' text='Update needed :' active='false'/>
+					<div id='ModDownloadButtonObject' />
+				</vertical>
+			</horizontal>
 		</vertical>
 	</horizontal>
 </vertical>
