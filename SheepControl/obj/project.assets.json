@@ -1212,11 +1212,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\user\\Desktop\\Items\\Files\\Codes\\BSMods\\GuildSaberProfile_\\GuildSaberProfile_\\SheepControl.csproj",
+      "projectUniqueName": "C:\\Users\\user\\Documents\\GitHub\\SheepControl\\SheepControl\\SheepControl.csproj",
       "projectName": "SheepControl",
-      "projectPath": "C:\\Users\\user\\Desktop\\Items\\Files\\Codes\\BSMods\\GuildSaberProfile_\\GuildSaberProfile_\\SheepControl.csproj",
+      "projectPath": "C:\\Users\\user\\Documents\\GitHub\\SheepControl\\SheepControl\\SheepControl.csproj",
       "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\user\\Desktop\\Items\\Files\\Codes\\BSMods\\GuildSaberProfile_\\GuildSaberProfile_\\obj\\",
+      "outputPath": "C:\\Users\\user\\Documents\\GitHub\\SheepControl\\SheepControl\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
       "configFilePaths": [

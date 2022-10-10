@@ -24,6 +24,9 @@ using ToggleSetting = BeatSaberMarkupLanguage.Components.Settings.ToggleSetting;
 using TMPro;
 using CP_SDK.Network;
 using System.Net.Http;
+using System.IO;
+using IPA.Loader;
+using System.Windows.Forms;
 
 namespace SheepControl.UI
 {
@@ -239,6 +242,10 @@ namespace SheepControl.UI
 
         internal static SettingsView m_Instance;
 
+        internal string UpdateFileLocation = $"{CP_SDK.ChatPlexSDK.ProductName}/Sheep/update.txt";
+
+        string m_UpdateModUrl = string.Empty;
+
         [UIObject("Tabs")] private readonly GameObject m_Tabs = null;
         [UIObject("TabSelector")] GameObject m_TabSelector = null;
 
@@ -289,7 +296,7 @@ namespace SheepControl.UI
         [UIObject("ModDownloadButtonObject")] GameObject m_ModDownloadButtonObject = null;
         [UIComponent("UpdateText")] TextMeshProUGUI m_UpdateText = null;
 
-        Button m_DownloadButton;
+        Button m_UpdateDownloadButton;
 
         public CustomKeyboard m_Keyboard;
 
@@ -358,6 +365,9 @@ namespace SheepControl.UI
 
             m_Keyboard = CustomUIComponent.Create<CustomKeyboard>(transform, true);
             Reload();
+
+            m_UpdateDownloadButton = BeatSaberPlus.SDK.UI.Button.Create(m_ModDownloadButtonObject.transform, "Download", DownloadUpdate);
+            m_UpdateDownloadButton.interactable = false;
 
             CheckForUpdates();
         }
@@ -429,11 +439,65 @@ namespace SheepControl.UI
         {
             using (System.Net.WebClient l_Client = new())
             {
-                string l_UpdateFileLocation = $"{CP_SDK.ChatPlexSDK.ProductName}/Sheep/update.txt";
+                l_Client.DownloadFileAsync(new System.Uri("https://raw.githubusercontent.com/SheepVand0/SheepControl/main/Updates/Update.txt"), UpdateFileLocation);
+                l_Client.DownloadFileCompleted += OnDownloadFnished;
+            }
+        }
 
-                l_Client.DownloadFileAsync(new System.Uri(""), l_UpdateFileLocation);
+        private void OnDownloadFnished(object p_Sender, System.ComponentModel.AsyncCompletedEventArgs p_EventArg)
+        {
+            if (p_EventArg.Error != null)
+            {
+                m_UpdateText.gameObject.SetActive(true);
+                m_UpdateText.text = "Error during getting update";
+                return;
             }
 
+            StreamReader l_File = File.OpenText(UpdateFileLocation);
+
+            string l_FirstLine = string.Empty;
+
+            if ((l_FirstLine = l_File.ReadLine()) == null) { m_UpdateText.gameObject.SetActive(true); m_UpdateText.text = "Error during getting updates"; return; }
+
+            string[] l_Splited = l_FirstLine.Split(';');
+
+            string l_Version = l_Splited[0];
+
+            m_UpdateModUrl = l_Splited[1];
+
+            PluginMetadata l_ModMetadata = PluginManager.GetPluginFromId("SheepControl");
+
+            if (l_ModMetadata.HVersion != new Hive.Versioning.Version(l_Version))
+            {
+                m_UpdateDownloadButton.interactable = true;
+                m_UpdateText.gameObject.SetActive(true);
+                m_UpdateText.text = $"New update to : {l_Version}";
+            };
+        }
+
+        private void DownloadUpdate()
+        {
+            string l_ModPath = "IPA/Pending/Plugins/SheepControl.dll";
+
+            using (System.Net.WebClient l_Client = new())
+            {
+                if (!Directory.Exists(l_ModPath))
+                    Directory.CreateDirectory(l_ModPath);
+
+                m_UpdateDownloadButton.interactable = false;
+
+                l_Client.DownloadFileAsync(new Uri(m_UpdateModUrl), l_ModPath);
+                l_Client.DownloadFileCompleted += (p_Sender, p_EventARg) =>
+                {
+                    m_UpdateDownloadButton.interactable = true;
+                    m_UpdateDownloadButton.SetButtonText("Redownload");
+                    m_UpdateText.gameObject.SetActive(false);
+                };
+                l_Client.DownloadProgressChanged += (p_Sender, p_EventArg) =>
+                {
+                    m_UpdateDownloadButton.SetButtonText($"{p_EventArg.ProgressPercentage}%");
+                };
+            }
         }
     }
 }
