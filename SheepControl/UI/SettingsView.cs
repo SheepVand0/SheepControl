@@ -21,6 +21,9 @@ using UnityEngine;
 using BeatSaberMarkupLanguage.Parser;
 using SliderSetting = BeatSaberMarkupLanguage.Components.Settings.SliderSetting;
 using ToggleSetting = BeatSaberMarkupLanguage.Components.Settings.ToggleSetting;
+using TMPro;
+using CP_SDK.Network;
+using System.Net.Http;
 
 namespace SheepControl.UI
 {
@@ -284,6 +287,7 @@ namespace SheepControl.UI
         Button m_BobbyReleaseButton = null;
 
         [UIObject("ModDownloadButtonObject")] GameObject m_ModDownloadButtonObject = null;
+        [UIComponent("UpdateText")] TextMeshProUGUI m_UpdateText = null;
 
         Button m_DownloadButton;
 
@@ -354,7 +358,12 @@ namespace SheepControl.UI
 
             m_Keyboard = CustomUIComponent.Create<CustomKeyboard>(transform, true);
             Reload();
+
+            CheckForUpdates();
         }
+
+        ////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////
 
         private void OnBobbyMoveEnabled(bool p_Enabled)
         {
@@ -379,6 +388,9 @@ namespace SheepControl.UI
             SConfig.GetStaticModSettings().IsCommandsEnabledInGame = m_InGameCommandsEnabled.Value;
             SConfig.Instance.Save();
         }
+
+        ////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////
 
         public void Reload()
         {
@@ -408,6 +420,20 @@ namespace SheepControl.UI
             m_BannedQueriesList.tableView.ReloadData();
 
             SConfig.Instance.Save();
+        }
+
+        ////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////
+
+        private void CheckForUpdates()
+        {
+            using (System.Net.WebClient l_Client = new())
+            {
+                string l_UpdateFileLocation = $"{CP_SDK.ChatPlexSDK.ProductName}/Sheep/update.txt";
+
+                l_Client.DownloadFileAsync(new System.Uri(""), l_UpdateFileLocation);
+            }
+
         }
     }
 }
