@@ -166,15 +166,15 @@ namespace SheepControl
     [HarmonyPatch(typeof(NoteCutSoundEffectManager), nameof(NoteCutSoundEffectManager.HandleNoteWasCut))]
     class NoteCutSoundEffectManagerFix
     {
-        public static bool m_Disabled = false;
+        public static bool m_Disabled = true;
 
-        static bool Prefix() => true;
+        static bool Prefix() => m_Disabled;
     }
 
     [HarmonyPatch(typeof(NoteCutSoundEffectManager), nameof(NoteCutSoundEffectManager.HandleNoteWasSpawned))]
     class NoteCutSoundEffectManagerFix2
     {
-        static bool Prefix() => true;
+        static bool Prefix() => NoteCutSoundEffectManagerFix.m_Disabled;
     }
 
     public static class RandomUtils

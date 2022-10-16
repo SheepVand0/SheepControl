@@ -1,0 +1,7 @@
+﻿<vertical id="Background" bg="round-rect-panel">
+	<text id="NameText"></text>
+	<horizontal id="PlayerTransform">
+		<div id="ButtonTransform"></div>
+		<slider-setting id="TimeSetting" show-buttons="true"></slider-setting>
+	</horizontal>
+</vertical>

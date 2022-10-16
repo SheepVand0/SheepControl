@@ -30,6 +30,7 @@ using System.Windows.Forms;
 using System.Collections;
 using UnityEngine.Rendering;
 using BeatmapEditor3D;
+using HMUI;
 
 namespace SheepControl.UI
 {
@@ -280,6 +281,7 @@ namespace SheepControl.UI
 
         [UIComponent("AskCommands")] ToggleSetting m_AskForCommands = null;
         [UIComponent("InGameCommandsEnabled")] ToggleSetting m_InGameCommandsEnabled = null;
+        [UIComponent("InMenuCommandsEnabled")] ToggleSetting m_InMenuCommandsEnabled = null;
 
         [UIValue("WhiteList")] List<object> m_WhiteListContent = new List<object>();
         [UIValue("BadWords")] List<object> m_BadWordsListContent = new List<object>();
@@ -304,6 +306,8 @@ namespace SheepControl.UI
         Button m_UpdateDownloadButton;
         Button m_ModUpdateRefreshButton;
 
+        CustomVideoPlayer m_Player;
+
         public CustomKeyboard m_Keyboard;
 
         protected override sealed void OnViewCreation()
@@ -321,6 +325,7 @@ namespace SheepControl.UI
             BeatSaberPlus.SDK.UI.ToggleSetting.Setup(m_EnableBobbyMoves, l_EnableBobbyMovesAction, SConfig.GetStaticModSettings().BobbyAutoRonde, true);
             BeatSaberPlus.SDK.UI.ToggleSetting.Setup(m_AskForCommands, l_ToggleActions, SConfig.GetStaticModSettings().AskForCommands, true);
             BeatSaberPlus.SDK.UI.ToggleSetting.Setup(m_InGameCommandsEnabled, l_ToggleActions, SConfig.GetStaticModSettings().IsCommandsEnabledInGame, true);
+            BeatSaberPlus.SDK.UI.ToggleSetting.Setup(m_InMenuCommandsEnabled, l_ToggleActions, SConfig.GetStaticModSettings().IsCommandsEnabledInMenu, true);
 
             BeatSaberPlus.SDK.UI.SliderSetting.Setup(m_BobbyMoveDurationSlider, l_SliderActions,
                 BeatSaberPlus.SDK.UI.BSMLSettingFormartter.Percentage, SConfig.GetStaticModSettings().BobbyMoveDuration ,true, false);
@@ -377,11 +382,12 @@ namespace SheepControl.UI
             m_UpdateDownloadButton = BeatSaberPlus.SDK.UI.Button.Create(m_ModDownloadButtonObject.transform, "Download", DownloadUpdate, p_PreferedWidth: 40);
             m_ModUpdateRefreshButton = BeatSaberPlus.SDK.UI.Button.Create(m_ModUpdateButtonRefreshObject.transform, "Refresh", CheckForUpdates, p_PreferedWidth: 40);
 
+
             CheckForUpdates();
         }
 
         ////////////////////////////////////////////////////////////////////////////
-        ///////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////
 
         private void OnBobbyMoveEnabled(bool p_Enabled)
         {
@@ -404,6 +410,7 @@ namespace SheepControl.UI
         {
             SConfig.GetStaticModSettings().AskForCommands = m_AskForCommands.Value;
             SConfig.GetStaticModSettings().IsCommandsEnabledInGame = m_InGameCommandsEnabled.Value;
+            SConfig.GetStaticModSettings().IsCommandsEnabledInMenu = m_InMenuCommandsEnabled.Value;
             SConfig.Instance.Save();
         }
 

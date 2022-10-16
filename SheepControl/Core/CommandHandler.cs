@@ -21,6 +21,8 @@ using HMUI;
 using UnityEngine.UI;
 using SheepControl.Trucs;
 using UnityEngine.SceneManagement;
+using CP_SDK.Unity.Extensions;
+using BeatmapEditor3D;
 
 namespace SheepControl
 {
@@ -96,7 +98,23 @@ namespace SheepControl
 
         public void HandleCommand(string p_Command)
         {
-            if (!IsCommandEnabled) return;
+            switch (BeatSaberPlus.SDK.Game.Logic.ActiveScene)
+            {
+                case Logic.SceneType.Menu:
+                    if (!SConfig.GetStaticModSettings().IsCommandsEnabledInMenu) return;
+                    break;
+                case Logic.SceneType.Playing:
+                    if (!SConfig.GetStaticModSettings().AskForCommands)
+                    {
+                        if (!SConfig.GetStaticModSettings().IsCommandsEnabledInGame) return;
+                    }
+                    else
+                    {
+                        if (!IsCommandEnabled) return;
+                    }
+                    break;
+                default: return;
+            }
 
             var l_Splited = p_Command.Split(' ');
             string l_Prefix = l_Splited[0];
@@ -388,9 +406,9 @@ namespace SheepControl
                         break;
                     case "play":
                         string l_Id = Transform_ToSpaces(l_Splited[l_IndexToAdd + 1]);
-                        int l_Speed = int.Parse(l_Splited[l_IndexToAdd + 3]);
+                        float l_Time = Utils.ParseFloat(l_Splited[l_IndexToAdd + 3]);
 
-                        Utils.PlaySongFromId(l_Id, l_Splited[l_IndexToAdd + 2], 0,
+                        Utils.PlaySongFromId(l_Id, l_Splited[l_IndexToAdd + 2], l_Time,
                         Resources.FindObjectsOfTypeAll<PlayerDataModel>().First().playerData,
                         (p_SceneTransitionSetup, p_LevelCompletionsReults, p_DifficultyBeatmap) => {});
                         break;
@@ -512,28 +530,42 @@ namespace SheepControl
                         {
                             NoteCutSoundEffectManagerFix.m_Disabled = false;
 
-                            DissolveAllObjectsRaw(0.2f);
+                            DissolveAllObjectsRaw(0f);
 
-                            BeatmapObjectSpawnController l_BeatmapObjectSpawnController = ObjectsGrabber.m_BeatmapObjectSpawnController/*Resources.FindObjectsOfTypeAll<BeatmapObjectSpawnController>().FirstOrDefault()*/;
+                            BeatmapObjectSpawnController l_BeatmapObjectSpawnController = Resources.FindObjectsOfTypeAll<BeatmapObjectSpawnController>().FirstOrDefault();
 
-                            BeatmapCallbacksController l_CallbacksController = ObjectsGrabber.m_BeatmapCallbacksControlller;
+                            BeatmapCallbacksController l_CallbacksController = l_BeatmapObjectSpawnController.GetField<BeatmapCallbacksController, BeatmapObjectSpawnController>("_beatmapCallbacksController");
 
                             GameSongController l_GameSongController = Resources.FindObjectsOfTypeAll<GameSongController>().FirstOrDefault();
 
                             BeatmapObjectSpawnMovementData l_BeatmapObjectSpawnMovementData = l_BeatmapObjectSpawnController.GetField<BeatmapObjectSpawnMovementData, BeatmapObjectSpawnController>("_beatmapObjectSpawnMovementData");
 
                             IReadonlyBeatmapData l_ReadonlyBeatmapData = l_CallbacksController.GetField<IReadonlyBeatmapData, BeatmapCallbacksController>("_beatmapData");
+
                             Task<IReadonlyBeatmapData> l_TaskNewReadonlyBeatmapData = Logic.LevelData.Data.GetTransformedBeatmapDataAsync();
                             l_TaskNewReadonlyBeatmapData.Wait();
+
                             BeatmapData l_NewReadonlyBeatmapData = (BeatmapData)l_TaskNewReadonlyBeatmapData.Result;
 
                             Plugin.Log.Info($"{l_ReadonlyBeatmapData.allBeatmapDataItems.Count}");
 
-                            //List<BeatmapDataItem> l_NewItems = l_NewReadonlyBeatmapData.allBeatmapDataItems.ToList();
+                            AudioTimeSyncController l_TimeSyncController = Resources.FindObjectsOfTypeAll<AudioTimeSyncController>().First();
+                            AudioSource l_AudioSource =
+                            l_TimeSyncController.GetField<AudioSource, AudioTimeSyncController>("_audioSource");
+                            ResetTimeSync(l_AudioSource, p_Beatmap.beatmapLevelData.audioClip, p_Time, p_Time, 1);
 
-                            //sDictionary<float, CallbacksInTime> l_BeatmapCallbackControllerCallbacksInTime = l_CallbacksController.GetField<Dictionary<float, CallbacksInTime>, BeatmapCallbacksController>("_callbacksInTimes");
+                            l_CallbacksController.sendCallbacksOnBeatmapDataChange = false;
 
-                            ObjectsGrabber.m_BeatmapCallbacksControlller.ReplaceBeatmapData(l_NewReadonlyBeatmapData);
+                            Dictionary<float, CallbacksInTime> l_Callbacks = l_CallbacksController.GetField<Dictionary<float, CallbacksInTime>, BeatmapCallbacksController>("_callbacksInTimes");
+                            //l_Callbacks.Clear();
+                            foreach (var l_Current in l_Callbacks.Values)
+                            {
+                                l_Current.lastProcessedNode = null;
+                            }
+
+                            l_CallbacksController.ReplaceBeatmapData(l_NewReadonlyBeatmapData);
+
+                            l_CallbacksController.SetField("_startFilterTime", p_Time);
 
                             IJumpOffsetYProvider l_JumpOffsetYProvider = l_BeatmapObjectSpawnMovementData.GetField<IJumpOffsetYProvider, BeatmapObjectSpawnMovementData>("_jumpOffsetYProvider");
                             BeatmapObjectSpawnControllerHelpers.GetNoteJumpValues(p_PlayerData.playerSpecificSettings, l_DiffBeatmap.noteJumpStartBeatOffset, out var l_NoteJumpvalueType, out var l_NoteJumpValue);
@@ -541,38 +573,10 @@ namespace SheepControl
                                 , l_JumpOffsetYProvider, Vector3.right, Vector3.forward);
                             l_CallbacksController.TriggerBeatmapEvent(new BPMChangeBeatmapEventData(p_Time, p_Beatmap.beatsPerMinute));
 
-                            Dictionary<float, CallbacksInTime> l_CallbacksInTime = l_CallbacksController.GetField<Dictionary<float, CallbacksInTime>, BeatmapCallbacksController>("_callbacksInTimes");
-                            foreach (var l_Current in l_CallbacksInTime)
-                            {
-                                var l_Value = l_Current.Value;
-                                var l_AheadTime = l_Value.aheadTime;
-                                if (l_Current.Key == l_BeatmapObjectSpawnMovementData.spawnAheadTime) {
-                                    var l_Callbacks = _CallbacksAccessor(ref l_Value);
-                                    l_AheadTime = l_BeatmapObjectSpawnMovementData.spawnAheadTime;
-                                    foreach (var l_Callback in l_Callbacks.Values)
-                                    {
-                                        l_Callback.ForEach(callback => { _CallbackWrapperAheadTimeAccessor(ref callback) = l_AheadTime; });
-                                    }
-                                }
-
-                                while (l_Value.lastProcessedNode.Next != null && l_Value.lastProcessedNode.Next.Value.time < p_Time)
-                                    l_Value.lastProcessedNode = l_Value.lastProcessedNode.Next;
-                            }
-
-
                             Plugin.Log.Info($"{l_CallbacksController.GetField<IReadonlyBeatmapData, BeatmapCallbacksController>("_beatmapData").allBeatmapDataItems.Count}");
 
-                            AudioTimeSyncController l_TimeSyncController = Resources.FindObjectsOfTypeAll<AudioTimeSyncController>().First();
-                            AudioSource l_AudioSource =
-                            l_TimeSyncController.GetField<AudioSource, AudioTimeSyncController>("_audioSource");
-                            l_AudioSource.Stop();
-                            l_AudioSource.time = p_Time;
-                            l_AudioSource.clip = p_Beatmap.beatmapLevelData.audioClip;
-                            l_AudioSource.Play();
+                            StartCoroutineWithDelay(DisableNotCutSoundFix(), 1);
 
-                            ResetNoteCutSoundManager();
-
-                            NoteCutSoundEffectManagerFix.m_Disabled = true;
                         }
                         catch (Exception l_E)
                         {
@@ -583,15 +587,29 @@ namespace SheepControl
             });
         }
 
+        public static void ResetTimeSync(AudioSource p_Source, AudioClip p_Clip, float p_Time, float p_TimeOffset, float p_TimeScale)
+        {
+            AudioTimeSyncController l_Controller = Resources.FindObjectsOfTypeAll<AudioTimeSyncController>().First();
+            AudioTimeSyncController.InitData initData =
+                l_Controller.GetField<AudioTimeSyncController.InitData, AudioTimeSyncController>("_initData");
+            AudioTimeSyncController.InitData newData = new AudioTimeSyncController.InitData(p_Clip,
+                            p_Time, p_TimeOffset, 1f);
+            var timeSync = l_Controller;
+            p_Source.clip = p_Clip;
+            l_Controller.SetField("_initData", newData);
+            l_Controller.SetField("_timeScale", p_TimeScale);
+            l_Controller.SetField("_startSongTime", p_Time);
+            l_Controller.SetField("_audioStartTimeOffsetSinceStart", timeSync.GetProperty<float, AudioTimeSyncController>("timeSinceStart") - (p_Time + newData.songTimeOffset));
+            l_Controller.SetField("_fixingAudioSyncError", false);
+            l_Controller.SetField("_playbackLoopIndex", 0);
+            l_Controller.SetField("_audioStarted", false);
+            p_Source.pitch = p_TimeScale;
+            timeSync.StartSong(newData.songTimeOffset);
+        }
+
         public static void ReplaceBeatmapData(this BeatmapCallbacksController p_CallbacksController, BeatmapData p_BeatmapData)
         {
-            try
-            {
-                p_CallbacksController.SetField("_beatmapData", p_BeatmapData);
-            } catch (Exception l_E)
-            {
-                Plugin.Log.Error($"{l_E}");
-            }
+            _beatmapDataAccessor(ref p_CallbacksController) = p_BeatmapData;
         }
 
         public static void DissolveAllObjectsRaw(float p_Duration)
@@ -607,6 +625,12 @@ namespace SheepControl
 
             foreach (var l_Current in Resources.FindObjectsOfTypeAll<ObstacleController>())
                 l_Current.Dissolve(p_Duration);
+        }
+
+        public static IEnumerator DisableNotCutSoundFix()
+        {
+            NoteCutSoundEffectManagerFix.m_Disabled = true;
+            yield return null;
         }
 
         public static void ResetNoteCutSoundManager()

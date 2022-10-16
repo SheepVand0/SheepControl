@@ -95,10 +95,17 @@
 							<text text='Ask for commands : ' font-size='3.5' color='yellow'></text>
 							<bool-setting id='AskCommands'></bool-setting>
 						</vertical>
+						<horizontal pref-width='10' />
 						<vertical>
 							<text text='Is command enabled : ' font-size='3.5' color='yellow'></text>
-							<text text=' (By default) ' font-size='3.5' color='yellow'></text>
+							<text text=' (Ingame) ' font-size='3.5' color='yellow'></text>
 							<bool-setting id='InGameCommandsEnabled'></bool-setting>
+						</vertical>
+						<horizontal pref-width='10' />
+						<vertical>
+							<text text='Is command enabled' font-size='3.5' color='yellow'></text>
+							<text text=' (Menu) ' font-size='3.5' color='yellow'></text>
+							<bool-setting id='InMenuCommandsEnabled'></bool-setting>
 						</vertical>
 					</horizontal>
 					<horizontal pref-height='20'/>
@@ -122,6 +129,12 @@
 					<horizontal pref-height='58'/>
 				</vertical>
 			</horizontal>
+
+			<!--<horizontal id='Test'>
+				<vertical id='TestTransform'>
+
+				</vertical>
+			</horizontal>-->
 		</vertical>
 	</horizontal>
 </vertical>

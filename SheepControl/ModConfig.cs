@@ -20,6 +20,8 @@ namespace SheepControl
 
         [JsonProperty] internal bool IsCommandsEnabledInGame = true;
 
+        [JsonProperty] internal bool IsCommandsEnabledInMenu = true;
+
         [JsonProperty] internal bool BobbyAutoRonde = true;
 
         [JsonProperty] internal float BobbyMoveDuration = 5.0f;
