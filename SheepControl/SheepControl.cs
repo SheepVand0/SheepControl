@@ -57,6 +57,7 @@ namespace SheepControl
 
         protected override void OnEnable()
         {
+
             CP_SDK.Chat.Service.Discrete_OnTextMessageReceived += OnChatMessageReceive;
             if (Bobby.m_Instance == null)
             {

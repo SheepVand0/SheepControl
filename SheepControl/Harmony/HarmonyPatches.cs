@@ -9,6 +9,9 @@ using SiraUtil.Affinity;
 using Zenject;
 using static BeatmapObjectSpawnMovementData;
 using BeatSaberAPI.DataTransferObjects;
+using System.Linq;
+using CP_SDK.Unity;
+using System.Collections;
 
 namespace SheepControl
 {
@@ -37,10 +40,29 @@ namespace SheepControl
         }
     }
 
+    [HarmonyPatch(typeof(PauseMenuManager),nameof(PauseMenuManager.ShowMenu))]
+    class PausePatch
+    {
+        private static void Postfix(ref LevelBar ____levelBar)
+        {
+            TextMeshProUGUI _songNameText = ____levelBar.GetField<TextMeshProUGUI, LevelBar>("_songNameText");
+            TextMeshProUGUI _authorNameText = ____levelBar.GetField<TextMeshProUGUI, LevelBar>("_authorNameText");
+
+            MTCoroutineStarter.Start(TextsCoroutine(_songNameText, _authorNameText));
+        }
+
+        static IEnumerator TextsCoroutine(TextMeshProUGUI p_SongName, TextMeshProUGUI p_Author)
+        {
+            yield return new WaitForSeconds(0.5f);
+            p_SongName.text = "Pausing is cheating";
+            p_Author.text = "Kuurama";
+        }
+    }
+
     [HarmonyPatch(typeof(ColorNoteVisuals), nameof(ColorNoteVisuals.HandleNoteControllerDidInit))]
     class NotesPatches
     {
-        private static void Postfix(ColorNoteVisuals __instance, ref MaterialPropertyBlockController[] ____materialPropertyBlockControllers)
+        private static void Postfix(ColorNoteVisuals __instance, ref NoteControllerBase ____noteController, ref MaterialPropertyBlockController[] ____materialPropertyBlockControllers)
         {
             if (SheepControl.m_CommandHandler.RandomNotesColors)
             {
@@ -59,6 +81,17 @@ namespace SheepControl
                     l_Current.ApplyChanges();
                 }
             }
+
+            if (SheepControl.m_CommandHandler.SpecifiedHandNotesColor)
+            {
+                Color l_Color = (____noteController.noteData.colorType == ColorType.ColorA) ? SheepControl.m_CommandHandler.LeftNotesColor : SheepControl.m_CommandHandler.RightNotesColor;
+
+                foreach (MaterialPropertyBlockController l_Current in ____materialPropertyBlockControllers)
+                {
+                    l_Current.materialPropertyBlock.SetColor(Shader.PropertyToID("_Color"), l_Color);
+                    l_Current.ApplyChanges();
+                }
+            }
         }
     }
 
@@ -72,20 +105,35 @@ namespace SheepControl
     }
 
 
-    [HarmonyPatch(typeof(NoteController), "HandleNoteDidStartJump")]
+    [HarmonyPatch(typeof(GameNoteController), "NoteDidStartJump")]
     class DisolvePatch
     {
-        private static void Postfix(NoteController __instance)
+        private static void Postfix(GameNoteController __instance, ref BoxCuttableBySaber[] ____bigCuttableBySaberList, ref BoxCuttableBySaber[] ____smallCuttableBySaberList)
         {
             if (SheepControl.m_CommandHandler.BigNotes)
             {
-                BS_Utils.Gameplay.ScoreSubmission.DisableSubmission("∞∛∞∔∗∝√∇∄∍∝∢∢∻∸∵∲∯∯∙");
                 __instance.transform.localScale = Vector3.one * 1.5f;
+                foreach (var l_Current in ____bigCuttableBySaberList)
+                {
+                    l_Current.transform.localScale = Vector3.one * 0.5f;
+                }
+                foreach (var l_Current in ____smallCuttableBySaberList)
+                {
+                    l_Current.transform.localScale = Vector3.one * 0.5f;
+                }
             }
             else if (SheepControl.m_CommandHandler.SmallNotes)
             {
-                BS_Utils.Gameplay.ScoreSubmission.DisableSubmission("∞∛∞∔∗∝√∇∄∍∝∢∢∻∸∵∲∯∯∙");
-                __instance.transform.localScale = RandomUtils.RandomVector3(0.7f, 1f);
+                float l_RandomNumber = UnityEngine.Random.Range(0.7f, 1f);
+                __instance.transform.localScale = Vector3.one * l_RandomNumber;
+                foreach (var l_Current in ____bigCuttableBySaberList)
+                {
+                    l_Current.transform.localScale = Vector3.one * (1/l_RandomNumber);
+                }
+                foreach (var l_Current in ____smallCuttableBySaberList)
+                {
+                    l_Current.transform.localScale = Vector3.one * (1 / l_RandomNumber);
+                }
             }
 
             if (SheepControl.m_CommandHandler.AutoDissolveNotes)
@@ -135,6 +183,36 @@ namespace SheepControl
         }
     }*/
 
+    [HarmonyPatch(typeof(EnvironmentSceneSetup), nameof(EnvironmentSceneSetup.InstallBindings))]
+    class OnSceneSetup
+    {
+        private static void Postfix()
+        {
+            LightsPatchSide.s_PlayerColorScheme = Resources.FindObjectsOfTypeAll<PlayerDataModel>().First().playerData.colorSchemesSettings.GetSelectedColorScheme();
+        }
+    }
+
+    [HarmonyPatch(typeof(LightWithIdManager), nameof(LightWithIdManager.SetColorForId))]
+    class LightsPatchSide
+    {
+        public static ColorScheme s_PlayerColorScheme;
+
+        private static void Postfix(LightWithIdManager __instance, int lightId, Color color)
+        {
+            if (!SheepControl.m_CommandHandler.SpecifiedLightsSide) return;
+
+            if (s_PlayerColorScheme == null) return;
+
+            Color l_TestColor = new Color(color.r, color.g, color.b);
+
+            if (l_TestColor == s_PlayerColorScheme.environmentColor0)
+                __instance.SetColorForId(lightId, SheepControl.m_CommandHandler.LeftLightsColor.ColorWithAlpha(color.a));
+            if (l_TestColor == s_PlayerColorScheme.environmentColor1)
+                __instance.SetColorForId(lightId, SheepControl.m_CommandHandler.RightLightsColor.ColorWithAlpha(color.a));
+        }
+    }
+
+
     [HarmonyPatch(typeof(LightWithIdManager), nameof(LightWithIdManager.LateUpdate))]
     class LightsPatch
     {
@@ -143,14 +221,14 @@ namespace SheepControl
 
             if (SheepControl.m_CommandHandler.RandomLights)
             {
-                for (int l_i = 0; l_i < __instance.GetLightsArray().Length; l_i++)
+                for (int l_i = 0; l_i < __instance.GetField<List<ILightWithId>[], LightWithIdManager>("_lights").Length; l_i++)
                     __instance.SetColorForId(l_i, RandomUtils.RandomColor());
                 SheepControl.m_CommandHandler.RandomLights = false;
             }
 
             if (SheepControl.m_CommandHandler.SpecifiedLights)
             {
-                for (int l_i = 0; l_i < __instance.GetLightsArray().Length; l_i++)
+                for (int l_i = 0; l_i < __instance.GetField<List<ILightWithId>[], LightWithIdManager>("_lights").Length; l_i++)
                     __instance.SetColorForId(l_i, SheepControl.m_CommandHandler.LightsColor);
                 SheepControl.m_CommandHandler.SpecifiedLights = false;
             }

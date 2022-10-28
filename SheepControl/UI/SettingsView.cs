@@ -298,10 +298,13 @@ namespace SheepControl.UI
         Button m_ResetBobbyButton = null;
         Button m_ResetConfigButton = null;
         Button m_BobbyReleaseButton = null;
+        Button m_EnableAutoDissolveNotes = null;
+        Button m_DisableAutoDissolveNotes = null;
 
         [UIObject("ModDownloadButtonObject")] GameObject m_ModDownloadButtonObject = null;
         [UIObject("ModUpdateButtonRefreshObject")] GameObject m_ModUpdateButtonRefreshObject = null;
         [UIComponent("UpdateText")] TextMeshProUGUI m_UpdateText = null;
+        [UIComponent("CurrentVersionText")] TextMeshProUGUI m_CurrentVersionText = null;
 
         Button m_UpdateDownloadButton;
         Button m_ModUpdateRefreshButton;
@@ -375,13 +378,18 @@ namespace SheepControl.UI
             m_ResetConfigButton = BeatSaberPlus.SDK.UI.Button.Create(m_QuickActionsTransform.transform, "Reset config",
                 () => { SConfig.Instance.Reset(); Reload(); SConfig.Instance.Save(); }, p_PreferedWidth: 40); ;
 
+            m_EnableAutoDissolveNotes = BeatSaberPlus.SDK.UI.Button.Create(m_QuickActionsTransform.transform, "Enable Auto dissolve",
+                () => { SheepControl.m_CommandHandler.HandleCommand("!sudo enable AutoDissolveNotes"); });
+
+            m_DisableAutoDissolveNotes = BeatSaberPlus.SDK.UI.Button.Create(m_QuickActionsTransform.transform, "Disable Auto dissolve",
+                () => { SheepControl.m_CommandHandler.HandleCommand("!sudo disable AutoDissolveNotes"); });
 
             m_Keyboard = CustomUIComponent.Create<CustomKeyboard>(transform, true);
             Reload();
 
             m_UpdateDownloadButton = BeatSaberPlus.SDK.UI.Button.Create(m_ModDownloadButtonObject.transform, "Download", DownloadUpdate, p_PreferedWidth: 40);
             m_ModUpdateRefreshButton = BeatSaberPlus.SDK.UI.Button.Create(m_ModUpdateButtonRefreshObject.transform, "Refresh", CheckForUpdates, p_PreferedWidth: 40);
-
+            m_CurrentVersionText.text = $"Current version : {PluginManager.GetPluginFromId("SheepControl").HVersion.ToString()}";
 
             CheckForUpdates();
         }

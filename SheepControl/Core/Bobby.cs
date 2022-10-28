@@ -13,6 +13,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Networking;
 using BeatSaberPlus.SDK.Game;
+using System.Xml.Linq;
+using System;
 
 namespace SheepControl.Trucs
 {
@@ -63,20 +65,26 @@ namespace SheepControl.Trucs
 
         public void Awake()
         {
-            m_Instance = this;
-
-            StartCoroutine(GetClips());
-
-            transform.position = new Vector3(-2.38f, 0.2f, 1.5f);
-            transform.rotation = Quaternion.Euler(0, 300.4f, 0);
-
-            m_Note = SpawnNote(transform.position, transform.rotation.eulerAngles, true, true);
-
-            SetColor(new Color(1, 0, 1));
-
-            m_EnableRandomMoves = SConfig.GetStaticModSettings().BobbyAutoRonde;
-
-            ApplyConfig();
+            Bobby.m_Instance = this;
+            this.StartCoroutine(this.GetClips());
+            SceneManager.LoadSceneAsync("StandardGameplay", LoadSceneMode.Additive).completed += (_) =>
+            {
+                m_NotePrefab = ((IEnumerable<BeatmapObjectsInstaller>)Resources.FindObjectsOfTypeAll<BeatmapObjectsInstaller>()).FirstOrDefault<BeatmapObjectsInstaller>().GetField<GameNoteController, BeatmapObjectsInstaller>("_normalBasicNotePrefab");
+                m_Note = UnityEngine.Object.Instantiate<GameObject>(this.m_NotePrefab.transform.GetChild(0).gameObject);
+                m_Note.transform.SetParent(this.transform);
+                UnityEngine.Object.DontDestroyOnLoad((UnityEngine.Object)this.m_Note);
+                foreach (MaterialPropertyBlockController l_Component in this.m_Note.GetComponents<MaterialPropertyBlockController>())
+                {
+                    l_Component.materialPropertyBlock.SetColor(Shader.PropertyToID("_Color"), new Color(0.9f, 0.0f, 0.9f));
+                    l_Component.ApplyChanges();
+                }
+                transform.position = new Vector3(-2.38f, 0.2f, 1.5f);
+                transform.rotation = Quaternion.Euler(90f, 300.4f, 0.0f);
+                m_Note.GetComponentInChildren<NoteBigCuttableColliderSize>().gameObject.SetActive(false);
+                m_EnableRandomMoves = SConfig.GetStaticModSettings().BobbyAutoRonde;
+                ApplyConfig();
+                SceneManager.UnloadSceneAsync("StandardGameplay");
+            };
         }
 
         public Vector3Animation IntelligentMove(Vector3 p_NewPos, float p_Speed)
@@ -129,7 +137,7 @@ namespace SheepControl.Trucs
                 try
                 {
                     Vector3 l_RandomPos = new Vector3(UnityEngine.Random.Range(-6, 6), BOBBY_HEIGHT, UnityEngine.Random.Range(-2, 6));
-                    switch (UnityEngine.Random.Range(5, 7))
+                    switch (UnityEngine.Random.Range(-1, 6))
                     {
                         case 0:
                             StopCurrentAnims();
@@ -157,10 +165,10 @@ namespace SheepControl.Trucs
                             ReleaseAll();
                             break;
                         case 6:
-                            if (UnityEngine.Random.Range(0, 2) == 1)
-                            {
-                                SpawnNote(transform.localPosition, new Vector3(90, 0, 0), true, true);
-                            }
+                            /*GameObject l_Obj = new GameObject("BobbyNote");
+                            l_Obj.transform.SetParent(m_Note.transform);
+                            l_Obj.transform.localRotation = Quaternion.Euler(RandomUtils.RandomVector3(-180, 180));
+                            SpawnNote(l_Obj.transform, new Vector3(90, 0, 0), true, true);*/
                             break;
                     }
                     StartCoroutine(Ronde());
@@ -171,35 +179,36 @@ namespace SheepControl.Trucs
                 }
         }
 
-        public GameObject SpawnNote(Vector3 p_Position, Vector3 p_Rotation, bool p_DisableSmall, bool p_DisableBig)
+        public void SpawnNote(Transform p_Parent, Vector3 p_Rotation, bool p_DisableSmall, bool p_DisableBig)
         {
-            if (BeatSaberPlus.SDK.Game.Logic.ActiveScene == Logic.SceneType.Playing) return null;
+            if (BeatSaberPlus.SDK.Game.Logic.ActiveScene == Logic.SceneType.Playing) return;
 
             GameObject l_Note = null;
-            SceneManager.LoadScene("StandardGameplay", LoadSceneMode.Additive);
-
-            var l_BeatmapObjectsInstaller = Resources.FindObjectsOfTypeAll<BeatmapObjectsInstaller>().FirstOrDefault();
-            var l_OriginalNotePrefab = l_BeatmapObjectsInstaller.GetField<GameNoteController, BeatmapObjectsInstaller>("_normalBasicNotePrefab");
-
-            GameNoteController l_NotePrefab = l_OriginalNotePrefab;
-            l_Note = Instantiate(l_NotePrefab.transform.GetChild(0).gameObject);
-
-            foreach (var l_MatControl in l_Note.GetComponents<MaterialPropertyBlockController>())
+            SceneManager.LoadSceneAsync("StandardGameplay", LoadSceneMode.Additive).completed += (_) =>
             {
-                l_MatControl.materialPropertyBlock.SetColor(Shader.PropertyToID("_Color"), RandomUtils.RandomColor());
-                l_MatControl.ApplyChanges();
-            }
+                var l_BeatmapObjectsInstaller = Resources.FindObjectsOfTypeAll<BeatmapObjectsInstaller>().FirstOrDefault();
+                var l_OriginalNotePrefab = l_BeatmapObjectsInstaller.GetField<GameNoteController, BeatmapObjectsInstaller>("_normalBasicNotePrefab");
 
-            if (p_DisableBig)
-                l_Note.GetComponentInChildren<NoteBigCuttableColliderSize>().gameObject.SetActive(false);
-            if (p_DisableSmall)
-                l_Note.GetComponentInChildren<BoxCuttableBySaber>().gameObject.SetActive(false);
-            l_Note.transform.localPosition = p_Position;
-            l_Note.transform.localRotation = Quaternion.Euler(p_Rotation + new Vector3(90, 0, 0));
+                GameNoteController l_NotePrefab = l_OriginalNotePrefab;
+                l_Note = Instantiate(l_NotePrefab.transform.GetChild(0).gameObject);
+                l_Note.transform.localPosition = p_Parent.localPosition;
+                l_Note.transform.localRotation = Quaternion.Euler(p_Rotation + new Vector3(90, 0, 0));
 
-            SceneManager.UnloadSceneAsync("StandardGameplay");
+                //GameObject.DontDestroyOnLoad(l_Note.gameObject);
 
-            return l_Note;
+                foreach (var l_MatControl in l_Note.GetComponents<MaterialPropertyBlockController>())
+                {
+                    l_MatControl.materialPropertyBlock.SetColor(Shader.PropertyToID("_Color"), RandomUtils.RandomColor());
+                    l_MatControl.ApplyChanges();
+                }
+
+                if (p_DisableBig)
+                    l_Note.GetComponentInChildren<NoteBigCuttableColliderSize>().gameObject.SetActive(false);
+                if (p_DisableSmall)
+                    l_Note.GetComponentInChildren<BoxCuttableBySaber>().gameObject.SetActive(false);
+
+                SceneManager.UnloadSceneAsync("StandardGameplay");
+            };
         }
 
         public void StopCurrentAnims()

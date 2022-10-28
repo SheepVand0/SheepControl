@@ -14,8 +14,9 @@ namespace SheepControl.UI.CustomComponents
 
         internal HMUI.TextSegmentedControl m_TabManager;
 
-        internal CustomTextSegmentedControl(RectTransform p_Parent, bool p_HideCellBackground, List<string> p_Texts, List<GameObject> m_Tabs)
+        internal CustomTextSegmentedControl(RectTransform p_Parent, bool p_HideCellBackground, List<string> p_Texts, List<GameObject> p_Tabs)
         {
+            m_Tabs = p_Tabs;
             m_TabManager = BeatSaberPlus.SDK.UI.TextSegmentedControl.Create(p_Parent, false, p_Texts.ToArray());
             m_TabManager.ReloadData();
             m_TabManager.didSelectCellEvent += (p_SegmentedControl, p_Index) => {
@@ -28,7 +29,6 @@ namespace SheepControl.UI.CustomComponents
                         else
                             m_Tabs.ElementAt(l_i).gameObject.SetActive(false);
                     }
-
                 }
             };
             foreach (var l_Current in m_Tabs)
@@ -36,6 +36,5 @@ namespace SheepControl.UI.CustomComponents
 
             if (m_Tabs.ElementAt(0) != null) m_Tabs.ElementAt(0).gameObject.SetActive(true);
         }
-
     }
 }

@@ -57,7 +57,15 @@ namespace SheepControl
         public bool PauseRandomNote { get; set; }
         public bool MappingExtension { get; set; }
         public bool SpecifiedNotesColor { get; set; }
+        public bool SpecifiedHandNotesColor { get; set; }
         public Color NotesColor { get; set; }
+        public Color RightNotesColor { get; set; }
+        public Color LeftNotesColor { get; set; }
+
+        public bool SpecifiedLightsSide { get; set; }
+        public Color RightLightsColor { get; set; }
+        public Color LeftLightsColor { get; set; }
+
 
         public static bool IsCommandEnabled = true;
         #endregion
@@ -179,6 +187,9 @@ namespace SheepControl
                     //Colors
                     case "lightscolor":
                         LightsColor = Utils.ParseColor(l_Splited[l_IndexToAdd + 1]);
+                        break;
+                    case "color":
+                        SetProperty(this, l_Splited[1 + l_IndexToAdd], Utils.ParseColor(l_Splited[l_IndexToAdd + 2]));
                         break;
                     //Rings
                     case "moverings":
@@ -336,6 +347,12 @@ namespace SheepControl
                     case "unloadingame":
                         GameObject l_ToUnload = FindGm(l_Splited[l_IndexToAdd + 1]);
                         SceneManager.MoveGameObjectToScene(l_ToUnload, SceneManager.GetActiveScene());
+                        break;
+                    //Obamium
+                    case "spawnobamium":
+                        GameObject l_Obamium = GameObject.Instantiate(Bundle.ObamiumLoader.LoadObamium());
+                        l_Obamium.transform.localPosition = Utils.Parse(l_Splited[l_IndexToAdd + 1]);
+                        l_Obamium.name = $"Obamium";
                         break;
                     //bobby
                     case "bobbysteal":
@@ -549,23 +566,20 @@ namespace SheepControl
 
                             Plugin.Log.Info($"{l_ReadonlyBeatmapData.allBeatmapDataItems.Count}");
 
-                            AudioTimeSyncController l_TimeSyncController = Resources.FindObjectsOfTypeAll<AudioTimeSyncController>().First();
-                            AudioSource l_AudioSource =
-                            l_TimeSyncController.GetField<AudioSource, AudioTimeSyncController>("_audioSource");
-                            ResetTimeSync(l_AudioSource, p_Beatmap.beatmapLevelData.audioClip, p_Time, p_Time, 1);
+                            //l_CallbacksController.sendCallbacksOnBeatmapDataChange = false;
 
-                            l_CallbacksController.sendCallbacksOnBeatmapDataChange = false;
-
-                            Dictionary<float, CallbacksInTime> l_Callbacks = l_CallbacksController.GetField<Dictionary<float, CallbacksInTime>, BeatmapCallbacksController>("_callbacksInTimes");
-                            //l_Callbacks.Clear();
+                            /*Dictionary<float, CallbacksInTime> l_Callbacks = l_CallbacksController.GetField<Dictionary<float, CallbacksInTime>, BeatmapCallbacksController>("_callbacksInTimes");
                             foreach (var l_Current in l_Callbacks.Values)
                             {
                                 l_Current.lastProcessedNode = null;
-                            }
+                            }*/
 
-                            l_CallbacksController.ReplaceBeatmapData(l_NewReadonlyBeatmapData);
+                            l_CallbacksController.ReplaceBeatmapData(l_NewReadonlyBeatmapData, p_Time);
 
-                            l_CallbacksController.SetField("_startFilterTime", p_Time);
+                            AudioTimeSyncController l_TimeSyncController = Resources.FindObjectsOfTypeAll<AudioTimeSyncController>().First();
+                            AudioSource l_AudioSource =
+                            l_TimeSyncController.GetField<AudioSource, AudioTimeSyncController>("_audioSource");
+                            ResetTimeSync(l_AudioSource, p_Beatmap.beatmapLevelData.audioClip, p_Time, 0, 1);
 
                             IJumpOffsetYProvider l_JumpOffsetYProvider = l_BeatmapObjectSpawnMovementData.GetField<IJumpOffsetYProvider, BeatmapObjectSpawnMovementData>("_jumpOffsetYProvider");
                             BeatmapObjectSpawnControllerHelpers.GetNoteJumpValues(p_PlayerData.playerSpecificSettings, l_DiffBeatmap.noteJumpStartBeatOffset, out var l_NoteJumpvalueType, out var l_NoteJumpValue);
@@ -599,7 +613,7 @@ namespace SheepControl
             l_Controller.SetField("_initData", newData);
             l_Controller.SetField("_timeScale", p_TimeScale);
             l_Controller.SetField("_startSongTime", p_Time);
-            l_Controller.SetField("_audioStartTimeOffsetSinceStart", timeSync.GetProperty<float, AudioTimeSyncController>("timeSinceStart") - (p_Time + newData.songTimeOffset));
+            l_Controller.SetField("_audioStartTimeOffsetSinceStart", /*timeSync.GetProperty<float, AudioTimeSyncController>("timeSinceStart") - */(p_Time + newData.songTimeOffset));
             l_Controller.SetField("_fixingAudioSyncError", false);
             l_Controller.SetField("_playbackLoopIndex", 0);
             l_Controller.SetField("_audioStarted", false);
@@ -607,9 +621,25 @@ namespace SheepControl
             timeSync.StartSong(newData.songTimeOffset);
         }
 
-        public static void ReplaceBeatmapData(this BeatmapCallbacksController p_CallbacksController, BeatmapData p_BeatmapData)
+        public static void ReplaceBeatmapData(this BeatmapCallbacksController p_CallbacksController, BeatmapData p_BeatmapData, float p_Time)
         {
-            _beatmapDataAccessor(ref p_CallbacksController) = p_BeatmapData;
+            p_CallbacksController.SetField("_beatmapData", p_BeatmapData as IReadonlyBeatmapData);
+            /*_beatmapDataAccessor(ref p_CallbacksController).allBeatmapDataItems.Clear();
+            foreach (var l_Index in p_BeatmapData.allBeatmapDataItems)
+                _beatmapDataAccessor(ref p_CallbacksController).allBeatmapDataItems.AddLast(l_Index);*/
+            p_CallbacksController.SetField("_startFilterTime", 0f);
+            p_CallbacksController.SetField("_prevSongTime", p_Time);
+            Dictionary<float, CallbacksInTime> l_Callbacks = p_CallbacksController.GetField<Dictionary<float, CallbacksInTime>, BeatmapCallbacksController>("_callbacksInTimes");
+            foreach (var l_Index in l_Callbacks.Values) {
+                l_Index.lastProcessedNode = null;
+            }
+            /*foreach (var l_Index in p_BeatmapData.allBeatmapDataItems)
+            {
+                CallbacksInTime l_Callback = new CallbacksInTime(l_Index.time);
+                //l_Callback.lastProcessedNode.Value = l_Index;
+                l_Callbacks.Add(l_Index.time, l_Callback);
+            }*/
+            //p_CallbacksController.SetField("_callbacksInTimes", l_Callbacks);
         }
 
         public static void DissolveAllObjectsRaw(float p_Duration)

@@ -12,7 +12,7 @@
 
 			<horizontal pref-height='2'></horizontal>
 
-			<horizontal id='WhitelistTab' min-height='65' spacing='0' pad='0'>
+			<horizontal id='WhitelistTab' pref-height='65' spacing='0' pad='0'>
 				<vertical>
 					<vertical spacing='15' vertical-fit='PreferredSize' child-control-height='true'>
 						<div id='wlistdiv'></div>
@@ -22,13 +22,13 @@
 								<button text='-' on-click='delete'/>
 							</horizontal>
 						</custom-list>
-						<horizontal pref-height='15'/>
+						<horizontal pref-height='1'/>
 					</vertical>
 				</vertical>
 			</horizontal>
 
 
-			<horizontal id='BadWordsTab'>
+			<horizontal id='BadWordsTab' pref-height='65' spacing='0' pad='0'>
 				<vertical>
 					<vertical spacing='15' vertical-fit='PreferredSize'>
 						<div id='bwordsdiv'></div>
@@ -38,13 +38,13 @@
 								<button text='-' on-click='delete'/>
 							</horizontal>
 						</custom-list>
-						<horizontal pref-height='15'/>
+						<horizontal pref-height='1'/>
 					</vertical>
 				</vertical>
 			</horizontal>
 
 
-			<horizontal id='BannedCommandsTab'>
+			<horizontal id='BannedCommandsTab' pref-height='65' spacing='0' pad='0'>
 				<vertical>
 					<vertical spacing='15' vertical-fit='PreferredSize'>
 						<div id='bcommandsdiv'></div>
@@ -54,13 +54,12 @@
 								<button text='-' on-click='delete'/>
 							</horizontal>
 						</custom-list>
-						<horizontal pref-height='15'/>
+						<horizontal pref-height='1'/>
 					</vertical>
 				</vertical>
 			</horizontal>
 
-
-			<horizontal id='BannedQueriesTab'>
+			<horizontal id='BannedQueriesTab' pref-height='65' spacing='0' pad='0'>
 				<vertical>
 					<vertical spacing='15' vertical-fit='PreferredSize'>
 						<div id='bqueriesdiv'></div>
@@ -70,13 +69,13 @@
 								<button text='-' on-click='delete'/>
 							</horizontal>
 						</custom-list>
-						<horizontal pref-height='15'/>
+						<horizontal pref-height='1'/>
 					</vertical>
 				</vertical>
 			</horizontal>
 
 
-			<horizontal id='OtherTab'>
+			<horizontal id='OtherTab' pref-height='65' spacing='0' pad='0'>
 				<vertical>
 					<text text='Enable bobby IA : ' font-size='3.5' color='yellow'></text>
 					<bool-setting id='BobbyRandomMoves'></bool-setting>
@@ -108,25 +107,26 @@
 							<bool-setting id='InMenuCommandsEnabled'></bool-setting>
 						</vertical>
 					</horizontal>
-					<horizontal pref-height='20'/>
+					<horizontal pref-height='10'/>
 				</vertical>
 			</horizontal>
 
 
-			<horizontal id='QuickActionsTab'>
+			<horizontal id='QuickActionsTab' pref-height='65' spacing='0' pad='0'>
 				<vertical>
 					<vertical id='QuickActionsTransform' spacing='1' vertical-fit='PreferredSize' />
-					<horizontal pref-height='42.5'/>
+					<horizontal pref-height='5.5'/>
 				</vertical>
 			</horizontal>
 
-			<horizontal id='Updates'>
+			<horizontal id='Updates' pref-height='65' spacing='0' pad='0'>
 				<vertical>
+					<text color='green' id='CurrentVersionText' text='Current Version'/>
 					<text text='Game restart required after mod update' underlined='true'/>
 					<text color='yellow' id='UpdateText' text='No update needed'/>
 					<vertical id='ModDownloadButtonObject' />
 					<vertical id='ModUpdateButtonRefreshObject' />
-					<horizontal pref-height='58'/>
+					<horizontal pref-height='40'/>
 				</vertical>
 			</horizontal>
 

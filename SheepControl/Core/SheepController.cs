@@ -169,6 +169,14 @@ namespace SheepControl
     {
         public static SheepControlController Instance { get; private set; }
 
+        public static void DestroyAll(string p_Name)
+        {
+            try
+            {
+                DestroyAll(p_Name);
+            } catch (Exception l_E) { }
+        }
+
         // These methods are automatically called by Unity, you should remove any you aren't using.
         #region Monobehaviour Messages
         /// <summary>
@@ -183,6 +191,7 @@ namespace SheepControl
 
             Logic.OnSceneChange += (p_Scene) =>
             {
+
                 StartCoroutine(RondBobby());
                 if (p_Scene == Logic.SceneType.Menu)
                     CommandHandler.IsCommandEnabled = true;
