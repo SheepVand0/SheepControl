@@ -10,7 +10,7 @@ namespace SheepControl.Bundle
         public static GameObject LoadObamium()
         {
             AssetBundle l_Bundle = AssetBundle.LoadFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream("SheepControl.Bundle.troll_bundle"));
-            GameObject l_Obamium = l_Bundle.LoadAsset<GameObject>("Obamium.prefab");
+            GameObject l_Obamium = l_Bundle.LoadAsset<GameObject>("ObamiumMesh");
             l_Bundle.Unload(false);
             return l_Obamium;
         }

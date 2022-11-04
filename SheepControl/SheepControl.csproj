@@ -239,8 +239,9 @@
     <Compile Include="API\ScoreSaberAPI.cs" />
     <Compile Include="Bundle\ObamiumLoader.cs" />
     <Compile Include="Core\CommandHandler.cs" />
+    <Compile Include="Core\Commands.cs" />
+    <Compile Include="Core\ObjectsGrabber.cs" />
     <Compile Include="Harmony\HarmonyPatches.cs" />
-    <Compile Include="Installers\OnGameInstallers.cs" />
     <Compile Include="ModConfig.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Configuration\PluginConfig.cs" />
@@ -264,8 +265,8 @@
     <EmbeddedResource Include="manifest.json" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Bundle\troll_bundle" />
     <EmbeddedResource Include="Bundle\sheepcontrol" />
+    <EmbeddedResource Include="Bundle\troll_bundle" />
     <None Include="Directory.Build.props" Condition="Exists('Directory.Build.props')" />
     <None Include="GuildSaberProfile_.csproj.user" Condition="Exists('GuildSaberProfile_.csproj.user')" />
     <EmbeddedResource Include="UI\Views\SettingsView.bsml" />

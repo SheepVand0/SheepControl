@@ -193,6 +193,7 @@ namespace SheepControl
             {
 
                 StartCoroutine(RondBobby());
+                Positions();
                 if (p_Scene == Logic.SceneType.Menu)
                     CommandHandler.IsCommandEnabled = true;
 
@@ -201,6 +202,11 @@ namespace SheepControl
             GameObject.DontDestroyOnLoad(this);
         }
         #endregion
+
+        public void Positions()
+        {
+            
+        }
 
         public IEnumerator PauseSong()
         {

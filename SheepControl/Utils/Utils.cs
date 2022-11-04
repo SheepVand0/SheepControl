@@ -12,20 +12,21 @@ namespace SheepControl.TUtils
 {
     internal static class TUtils
     {
-        public static void Turn(this GameObject p_GameObject, Vector3 p_Rotation, float p_Duration)
+        public static Vector3Animation Turn(this GameObject p_GameObject, Vector3 p_Rotation, float p_Duration)
         {
-            Vector3Animation l_RAnim = p_GameObject.AddComponent<Vector3Animation>();
-            l_RAnim.Init(p_GameObject.transform.localPosition, p_Rotation, p_Duration);
+            Vector3Animation.AddAnim(p_GameObject, out Vector3Animation l_RAnim);
+            l_RAnim.Init(p_GameObject.transform.localRotation.eulerAngles, p_Rotation, p_Duration);
             l_RAnim.OnVectorChange += (p_Value) =>
             {
                 p_GameObject.transform.localRotation = Quaternion.Euler(p_Value);
             };
             l_RAnim.Play();
+            return l_RAnim;
         }
 
         public static void Move(this GameObject p_GameObject, Vector3 p_Position, float p_Duration)
         {
-            Vector3Animation l_RAnim = p_GameObject.AddComponent<Vector3Animation>();
+            Vector3Animation.AddAnim(p_GameObject, out Vector3Animation l_RAnim);
             l_RAnim.Init(p_GameObject.transform.localPosition, p_Position, p_Duration);
             l_RAnim.OnVectorChange += (p_Value) =>
             {
@@ -36,7 +37,7 @@ namespace SheepControl.TUtils
 
         public static void Scale(this GameObject p_GameObject, Vector3 p_Scale, float p_Duration)
         {
-            Vector3Animation l_RAnim = p_GameObject.AddComponent<Vector3Animation>();
+            Vector3Animation.AddAnim(p_GameObject, out Vector3Animation l_RAnim);
             l_RAnim.Init(p_GameObject.transform.localScale, p_Scale, p_Duration);
             l_RAnim.OnVectorChange += (p_Value) =>
             {

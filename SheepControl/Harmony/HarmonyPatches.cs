@@ -3,7 +3,6 @@ using UnityEngine;
 using IPA.Utilities;
 using TMPro;
 using System.Threading.Tasks;
-using SheepControl.Installers;
 using System.Collections.Generic;
 using SiraUtil.Affinity;
 using Zenject;
@@ -12,6 +11,7 @@ using BeatSaberAPI.DataTransferObjects;
 using System.Linq;
 using CP_SDK.Unity;
 using System.Collections;
+using SheepControl.TUtils;
 
 namespace SheepControl
 {
@@ -40,7 +40,7 @@ namespace SheepControl
         }
     }
 
-    [HarmonyPatch(typeof(PauseMenuManager),nameof(PauseMenuManager.ShowMenu))]
+    [HarmonyPatch(typeof(PauseMenuManager), nameof(PauseMenuManager.ShowMenu))]
     class PausePatch
     {
         private static void Postfix(ref LevelBar ____levelBar)
@@ -104,12 +104,48 @@ namespace SheepControl
         }
     }
 
+    [HarmonyPatch(typeof(GameNoteController), nameof(GameNoteController.Init))]
+    class ResolveFirstPatch
+    {
+        private static void Postfix(GameNoteController __instance)
+        {
+            if (SheepControl.m_CommandHandler.AutoResolveNotes == false)
+            {
+                Transform l_Object = __instance.transform.GetChild(0).Find("NoteArrow");
+                Transform l_Object2 = __instance.transform.GetChild(0).Find("NoteArrowGlow");
+                Transform l_Object3 = __instance.transform.GetChild(0).Find("NoteCircleGlow");
+
+                l_Object.gameObject.SetActive(__instance.noteData.cutDirection != NoteCutDirection.Any);
+                l_Object2.gameObject.SetActive(__instance.noteData.cutDirection != NoteCutDirection.Any);
+                l_Object3.gameObject.SetActive(__instance.noteData.cutDirection == NoteCutDirection.Any);
+            }
+
+            if (!SheepControl.m_CommandHandler.AutoResolveNotes) return;
+
+            foreach (var l_Current in __instance.GetComponentsInChildren<Renderer>())
+                l_Current.enabled = false;
+        }
+    }
 
     [HarmonyPatch(typeof(GameNoteController), "NoteDidStartJump")]
     class DisolvePatch
     {
-        private static void Postfix(GameNoteController __instance, ref BoxCuttableBySaber[] ____bigCuttableBySaberList, ref BoxCuttableBySaber[] ____smallCuttableBySaberList)
+        private static void Postfix(GameNoteController __instance, BoxCuttableBySaber[] ____bigCuttableBySaberList, BoxCuttableBySaber[] ____smallCuttableBySaberList)
         {
+            foreach (var l_Render in __instance.GetComponentsInChildren<Renderer>())
+            {
+                l_Render.enabled = true;
+            }
+
+            Transform l_Object = __instance.transform.GetChild(0).Find("NoteArrow");
+            Transform l_Object2 = __instance.transform.GetChild(0).Find("NoteArrowGlow");
+            Transform l_Object3 = __instance.transform.GetChild(0).Find("NoteCircleGlow");
+
+            l_Object.gameObject.SetActive(__instance.noteData.cutDirection != NoteCutDirection.Any);
+            l_Object2.gameObject.SetActive(__instance.noteData.cutDirection != NoteCutDirection.Any);
+            l_Object3.gameObject.SetActive(__instance.noteData.cutDirection == NoteCutDirection.Any);
+
+
             if (SheepControl.m_CommandHandler.BigNotes)
             {
                 __instance.transform.localScale = Vector3.one * 1.5f;
@@ -128,7 +164,7 @@ namespace SheepControl
                 __instance.transform.localScale = Vector3.one * l_RandomNumber;
                 foreach (var l_Current in ____bigCuttableBySaberList)
                 {
-                    l_Current.transform.localScale = Vector3.one * (1/l_RandomNumber);
+                    l_Current.transform.localScale = Vector3.one * (1 / l_RandomNumber);
                 }
                 foreach (var l_Current in ____smallCuttableBySaberList)
                 {
@@ -141,6 +177,13 @@ namespace SheepControl
                 BaseNoteVisuals l_Visuals = __instance.GetComponent<BaseNoteVisuals>();
                 l_Visuals.AnimateCutout(0, 1, 0.5f);
             }
+            if (SheepControl.m_CommandHandler.AutoResolveNotes)
+            {
+                SheepControl.m_CommandHandler.AutoDissolveNotes = false;
+                BaseNoteVisuals l_Visuals = __instance.GetComponent<BaseNoteVisuals>();
+                l_Visuals.AnimateCutout(1, 0, 0.2f);
+            }
+
 
             if (SheepControl.m_CommandHandler.PauseRandomNote)
             {
@@ -158,7 +201,21 @@ namespace SheepControl
             {
                 BS_Utils.Gameplay.ScoreSubmission.DisableSubmission("∞∛∞∔∗∝√∇∄∍∝∢∢∻∸∵∲∯∯∙");
                 Quaternion l_Rot = __instance.transform.localRotation;
-                __instance.transform.localRotation = Quaternion.Euler(0, 0, l_Rot.z + Random.Range(-15f, 15f));
+                float l_RandomRange = Random.Range(-15f, 15f);
+                float l_OldZ = 0f;
+                __instance.gameObject.Turn(new Vector3(0, 0, l_Rot.z + l_RandomRange), 1f).OnVectorChange += (p_CurrentVector) =>
+                {
+                    foreach (var l_Box in ____bigCuttableBySaberList)
+                    {
+                        l_Box.transform.localRotation = Quaternion.Euler(l_Box.transform.localRotation.x, l_Box.transform.localRotation.y, l_Box.transform.localRotation.z + l_OldZ - p_CurrentVector.z);
+                    }
+
+                    foreach (var l_Box in ____smallCuttableBySaberList)
+                    {
+                        l_Box.transform.localRotation = Quaternion.Euler(l_Box.transform.localRotation.x, l_Box.transform.localRotation.y, l_Box.transform.localRotation.z + l_OldZ - p_CurrentVector.z);
+                    }
+                    l_OldZ = p_CurrentVector.z;
+                };
             }
 
             if (SheepControl.m_CommandHandler.MappingExtension)
@@ -169,19 +226,19 @@ namespace SheepControl
         }
     }
 
-    /*[HarmonyPatch(typeof(ObstacleController), nameof(ObstacleController.Init))]
+    [HarmonyPatch(typeof(ObstacleController), nameof(ObstacleController.Init))]
     class ObstaclesPatches
     {
-        private static void Prefix(ObstacleController __instance, ref StretchableObstacle ____stretchableObstacle)
+        private static void Postfix(ObstacleController __instance, ref StretchableObstacle ____stretchableObstacle)
         {
-            if (Plugin.m_CommandHandler.RandomColorWalls)
+            if (SheepControl.m_CommandHandler.RandomColorWalls)
             {
-                var l_streachableObstacle = __instance.GetField<StretchableObstacle, ObstacleController>("_stretchableObstacle");
+                //var l_streachableObstacle = __instance.GetField<StretchableObstacle, ObstacleController>("_stretchableObstacle");
 
-                l_streachableObstacle.SetSizeAndColor(__instance.width, __instance.height, __instance.length, ColorsUtils.RandomColor());
+                ____stretchableObstacle.SetSizeAndColor(__instance.width, __instance.height, __instance.length, RandomUtils.RandomColor());
             }
         }
-    }*/
+    }
 
     [HarmonyPatch(typeof(EnvironmentSceneSetup), nameof(EnvironmentSceneSetup.InstallBindings))]
     class OnSceneSetup
@@ -193,6 +250,7 @@ namespace SheepControl
     }
 
     [HarmonyPatch(typeof(LightWithIdManager), nameof(LightWithIdManager.SetColorForId))]
+    [HarmonyPriority(int.MinValue)]
     class LightsPatchSide
     {
         public static ColorScheme s_PlayerColorScheme;

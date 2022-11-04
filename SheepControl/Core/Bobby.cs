@@ -51,6 +51,9 @@ namespace SheepControl.Trucs
 
         public const float BOBBY_HEIGHT = 0.2f;
 
+        Vector3Animation m_MoveAnimation = null;
+        Vector3Animation m_RotationAnimation = null;
+
         IEnumerator GetClips()
         {
             using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip("https://github.com/SheepVand0/MySimplesCodes-NoUE/blob/main/Wool%20Placing%20(Nr.%204%20%20%20Minecraft%20Sound)%20-%20Sound%20Effect%20for%20editing.mp3?raw=true", AudioType.MPEG))
@@ -140,25 +143,20 @@ namespace SheepControl.Trucs
                     switch (UnityEngine.Random.Range(-1, 6))
                     {
                         case 0:
-                            StopCurrentAnims();
                             IntelligentMove(l_RandomPos, m_BobbyMoveDuration);
                             break;
                         case 1:
-                            StopCurrentAnims();
                             GameObject l_ToStealGm = FindGm(STEALABLE_GAME_OBJECTS[UnityEngine.Random.Range(0, STEALABLE_GAME_OBJECTS.Count)]);
                             IntelligentSteal(l_ToStealGm, m_BobbyStealDuration);
                             break;
                         case 2:
                             SetColor(RandomUtils.RandomColor());
-                            StopCurrentAnims();
                             IntelligentMove(l_RandomPos, m_BobbyMoveDuration);
                             break;
                         case 3:
-                            StopCurrentAnims();
                             Turn(new Vector3(90, 15000, 0), 112);
                             break;
                         case 4:
-                            StopCurrentAnims();
                             Turn(new Vector3(90, UnityEngine.Random.Range(0, 360), 0), m_BobbyTurnDuration);
                             break;
                         case 5:
@@ -219,11 +217,15 @@ namespace SheepControl.Trucs
 
         public Vector3Animation Move(Vector3 p_Pos, float p_Duration)
         {
-            Vector3Animation l_Animation = gameObject.AddComponent<Vector3Animation>();
-            l_Animation.Init(transform.localPosition, p_Pos, p_Duration);
-            l_Animation.Play();
-            l_Animation.OnVectorChange += OnMove;
-            return l_Animation;
+            if (m_MoveAnimation == null)
+            {
+                m_MoveAnimation = gameObject.AddComponent<Vector3Animation>();
+                m_MoveAnimation.OnVectorChange += OnMove;
+            }
+            m_MoveAnimation.Init(transform.localPosition, p_Pos, p_Duration);
+            m_MoveAnimation.Play();
+
+            return m_MoveAnimation;
         }
         void OnMove(Vector3 p_Value)
         {
@@ -238,11 +240,14 @@ namespace SheepControl.Trucs
 
         public Vector3Animation Turn(Vector3 p_NewRot, float p_Duration)
         {
-            Vector3Animation l_Animation = gameObject.AddComponent<Vector3Animation>();
-            l_Animation.Init(transform.localRotation.eulerAngles, p_NewRot, p_Duration);
-            l_Animation.Play();
-            l_Animation.OnVectorChange += OnTurn;
-            return l_Animation;
+            if (m_RotationAnimation == null)
+            {
+                m_RotationAnimation = gameObject.AddComponent<Vector3Animation>();
+                m_RotationAnimation.OnVectorChange += OnTurn;
+            }
+            m_RotationAnimation.Init(transform.localRotation.eulerAngles, p_NewRot, p_Duration);
+            m_RotationAnimation.Play();
+            return m_RotationAnimation;
         }
         void OnTurn(Vector3 p_NewRot)
         {

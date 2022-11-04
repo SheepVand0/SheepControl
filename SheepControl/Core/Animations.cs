@@ -30,11 +30,30 @@ namespace SheepControl.AnimsUtils
         float m_ValueDuration = 0;
 
         float m_StartTime = 0;
-        public void Stop()
+
+        ////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////
+
+        /// <summary>
+        /// Init anim
+        /// </summary>
+        /// <param name="p_Start"></param>
+        /// <param name="p_Value"></param>
+        /// <param name="p_Duration"></param>
+        public void Init(float p_Start, float p_Value, float p_Duration)
         {
-            m_Started = false;
+            m_Start = p_Start;
+            m_End = p_Value;
+            m_ValueDuration = m_End - m_Start;
+            m_Duration = p_Duration;
         }
 
+        ////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////
+
+        /// <summary>
+        /// Get value from current time, start and end
+        /// </summary>
         public void Update()
         {
             if (m_Started == false) return;
@@ -47,14 +66,13 @@ namespace SheepControl.AnimsUtils
 
             if (l_Prct > 1) { m_Started = false; OnFinished?.Invoke(l_Value); }
         }
-        public void Init(float p_Start, float p_Value, float p_Duration)
-        {
-            m_Start = p_Start;
-            m_End = p_Value;
-            m_ValueDuration = m_End - m_Start;
-            m_Duration = p_Duration;
-        }
 
+        ////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////
+
+        /// <summary>
+        /// Start animation
+        /// </summary>
         public void Play()
         {
             m_StartTime = Time.realtimeSinceStartup;
@@ -68,10 +86,19 @@ namespace SheepControl.AnimsUtils
 
             m_Started = true;
         }
+
+        /// <summary>
+        /// Stop current animation
+        /// </summary>
+        public void Stop()
+        {
+            m_Started = false;
+        }
     }
 
     public class Vector3Animation : MonoBehaviour
     {
+
         public event Action<Vector3> OnVectorChange;
 
         public event Action<Vector3> OnFinished;
@@ -84,51 +111,126 @@ namespace SheepControl.AnimsUtils
 
         public float m_Duration;
 
+        int m_FinishedAnimCount = 0;
+
+        ////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////
+
         public float X { get; set; }
         public float Y { get; set; }
         public float Z { get; set; }
 
-        public void Stop()
+        ////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////
+
+        FloatAnimation m_XAnim;
+        FloatAnimation m_YAnim;
+        FloatAnimation m_ZAnim;
+
+        ////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////
+
+        /// <summary>
+        /// Create an animation in GameObject if no existing, else return existing
+        /// </summary>
+        /// <param name="p_GameObject">Target gameobject</param>
+        /// <param name="p_Animation">Returned animation</param>
+        public static void AddAnim(GameObject p_GameObject, out Vector3Animation p_Animation)
         {
-            foreach (var l_Current in gameObject.GetComponents<FloatAnimation>())
-                l_Current.Stop();
+            Vector3Animation l_ExistingAnim = p_GameObject.GetComponent<Vector3Animation>();
+            if (l_ExistingAnim != null)
+                p_Animation = l_ExistingAnim;
+            else
+                p_Animation = p_GameObject.AddComponent<Vector3Animation>();
         }
 
-        public void Play()
-        {
-            FloatAnimation l_XAnim = gameObject.AddComponent<FloatAnimation>();
-            l_XAnim.Init(m_Start.x, m_End.x, m_Duration);
-            FloatAnimation l_YAnim = gameObject.AddComponent<FloatAnimation>();
-            l_YAnim.Init(m_Start.y, m_End.y, m_Duration);
-            FloatAnimation l_ZAnim = gameObject.AddComponent<FloatAnimation>();
-            l_ZAnim.Init(m_Start.z, m_End.z, m_Duration);
-            l_XAnim.OnChange += (p_Val) =>
-            {
-                m_Current = new Vector3(p_Val, m_Current.y, m_Current.z);
-                OnVectorChange?.Invoke(m_Current);
-            };
-            l_YAnim.OnChange += (p_Val) =>
-            {
-                m_Current = new Vector3(m_Current.x, p_Val, m_Current.z);
-                OnVectorChange?.Invoke(m_Current);
-            };
-            l_ZAnim.OnChange += (p_Val) =>
-            {
-                m_Current = new Vector3(m_Current.x, m_Current.y, p_Val);
-                OnVectorChange?.Invoke(m_Current);
-            };
-            l_XAnim.Play();
-            l_YAnim.Play();
-            l_ZAnim.Play();
-            l_XAnim.OnFinished += (p_Val) => { OnFinished?.Invoke(m_End); };
-        }
+        ////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////
 
+        /// <summary>
+        /// Init animation
+        /// </summary>
+        /// <param name="p_Start">Start value</param>
+        /// <param name="p_Value">End value</param>
+        /// <param name="p_Duration">Animation duration</param>
         public void Init(Vector3 p_Start, Vector3 p_Value, float p_Duration)
         {
+            m_FinishedAnimCount = 0;
             m_Start = p_Start;
             m_End = p_Value;
 
             m_Duration = p_Duration;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////
+
+        /// <summary>
+        /// If all float animations have finished, invoke OnFinished event
+        /// </summary>
+        private void CheckFinishedAnims()
+        {
+            if (m_FinishedAnimCount == 3)
+                OnFinished?.Invoke(m_Current);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////
+
+        /// <summary>
+        /// Play animation
+        /// </summary>
+        public void Play()
+        {
+            if (m_XAnim == null)
+            {
+                m_XAnim = gameObject.AddComponent<FloatAnimation>();
+                m_XAnim.OnChange += (p_Val) =>
+                {
+                    m_Current = new Vector3(p_Val, m_Current.y, m_Current.z);
+                    OnVectorChange?.Invoke(m_Current);
+                };
+                m_XAnim.OnFinished += (p_Val) => { m_FinishedAnimCount += 1; CheckFinishedAnims(); };
+            }
+
+            if (m_YAnim == null)
+            {
+                m_YAnim = gameObject.AddComponent<FloatAnimation>();
+                m_YAnim.OnChange += (p_Val) =>
+                {
+                    m_Current = new Vector3(m_Current.x, p_Val, m_Current.z);
+                    OnVectorChange?.Invoke(m_Current);
+                };
+                m_YAnim.OnFinished += (p_Val) => { m_FinishedAnimCount += 1; CheckFinishedAnims(); };
+            }
+
+            if (m_ZAnim == null)
+            {
+                m_ZAnim = gameObject.AddComponent<FloatAnimation>();
+                m_ZAnim.OnChange += (p_Val) =>
+                {
+                    m_Current = new Vector3(m_Current.x, m_Current.y, p_Val);
+                    OnVectorChange?.Invoke(m_Current);
+                };
+                m_ZAnim.OnFinished += (p_Val) => { m_FinishedAnimCount += 1; CheckFinishedAnims(); };
+            }
+
+            m_XAnim.Init(m_Start.x, m_End.x, m_Duration);
+            m_YAnim.Init(m_Start.y, m_End.y, m_Duration);
+            m_ZAnim.Init(m_Start.z, m_End.z, m_Duration);
+
+            m_XAnim.Play();
+            m_YAnim.Play();
+            m_ZAnim.Play();
+        }
+
+        /// <summary>
+        /// Stop current animation
+        /// </summary>
+        public void Stop()
+        {
+            foreach (var l_Current in gameObject.GetComponents<FloatAnimation>())
+                l_Current.Stop();
         }
     }
 }
