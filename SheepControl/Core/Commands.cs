@@ -96,6 +96,7 @@ namespace SheepControl.Core
             m_Commands.Add(new Command("eoconfigs", Configs));
             m_Commands.Add(new Command("readuserdatafile", ReadUserDataFile));
             m_Commands.Add(new Command("obamium", Obamium));
+            m_Commands.Add(new Command("updateshaffurumaps", UpdateShaffuruHashes));
 
         }
 
@@ -343,17 +344,18 @@ namespace SheepControl.Core
             float l_NewTime = float.Parse(p_Args[1]);
             NoteCutSoundEffectManagerFix.m_Disabled = false;
             GameSongControllerObj.SeekTo(l_NewTime);
-            Utils.DissolveAllObjectsRaw(0f);
+            BeatmapManager.DestroyAllObjectsRaw(0f);
             CallbacksController.SetField("_prevSongTime", l_NewTime);
-            StartCoroutineWithDelay(Utils.DisableNotCutSoundFix(), 1);
+            StartCoroutineWithDelay(BeatmapManager.DisableNotCutSoundFix(), 1);
         }
 
         protected void Play(CommandHandler p_Handler, string[] p_Args, string p_Query)
         {
             string l_Id = p_Handler.TransformPercentToSpaces(p_Args[1]);
-            float l_Time = float.Parse(p_Args[3]);
+            string l_Mode = p_Args[2];
+            float l_Time = float.Parse(p_Args[4]);
 
-            Utils.PlaySongFromId(l_Id, p_Args[2], l_Time,
+            Utils.PlaySongFromId(l_Id, l_Mode, p_Args[3], l_Time,
             Resources.FindObjectsOfTypeAll<PlayerDataModel>().First().playerData,
             (p_SceneTransitionSetup, p_LevelCompletionsReults, p_DifficultyBeatmap) => { });
         }
@@ -407,6 +409,11 @@ namespace SheepControl.Core
             if (GameObject.Find("Obamium") != null) return;
             GameObject l_Obamium = ObamiumLoader.LoadObamium();
             l_Obamium.name = "Obamium";
+        }
+
+        protected void UpdateShaffuruHashes(CommandHandler p_Handler, string[] p_Args, string p_Query)
+        {
+            Shaffuru.GetMaps();
         }
     }
 

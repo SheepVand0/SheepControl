@@ -3,9 +3,11 @@ using IPA.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using Zenject;
 
 namespace SheepControl.Core
 {
@@ -13,10 +15,11 @@ namespace SheepControl.Core
     {
 
         public static BeatmapObjectSpawnController ObjectSpawnController;
+        public static BasicBeatmapObjectManager ObjectManager;
         public static BeatmapCallbacksController CallbacksController;
         public static BeatmapObjectSpawnMovementData ObjectsSpawnMovementData;
         public static GameSongController GameSongControllerObj;
-        public static AudioTimeSyncController AudioTimeSyncController;
+        public static AudioTimeSyncController AudioTimeSyncControlleObj;
         public static AudioSource GameAudioSource;
         public static PlayerData GamePlayerData;
         public static Saber RightSaber;
@@ -29,10 +32,10 @@ namespace SheepControl.Core
                 ObjectSpawnController = Resources.FindObjectsOfTypeAll<BeatmapObjectSpawnController>().FirstOrDefault();
                 CallbacksController = ObjectSpawnController.GetField<BeatmapCallbacksController, BeatmapObjectSpawnController>("_beatmapCallbacksController");
                 GameSongControllerObj = Resources.FindObjectsOfTypeAll<GameSongController>().FirstOrDefault();
-                AudioTimeSyncController = Resources.FindObjectsOfTypeAll<AudioTimeSyncController>().FirstOrDefault();
+                AudioTimeSyncControlleObj = Resources.FindObjectsOfTypeAll<AudioTimeSyncController>().FirstOrDefault();
                 GamePlayerData = Resources.FindObjectsOfTypeAll<PlayerDataModel>().First().playerData;
                 ObjectsSpawnMovementData = ObjectSpawnController.GetField<BeatmapObjectSpawnMovementData, BeatmapObjectSpawnController>("_beatmapObjectSpawnMovementData");
-                GameAudioSource = AudioTimeSyncController.GetField<AudioSource, AudioTimeSyncController>("_audioSource");
+                GameAudioSource = AudioTimeSyncControlleObj.GetField<AudioSource, AudioTimeSyncController>("_audioSource");
                 Saber[] l_Sabers = Resources.FindObjectsOfTypeAll<Saber>();
                 foreach (var l_Saber in l_Sabers)
                 {
@@ -48,4 +51,21 @@ namespace SheepControl.Core
         }
 
     }
+
+    internal class ZenjectGrabber
+    {
+        public ZenjectGrabber(BasicBeatmapObjectManager p_BasicBeatmapObjectManager)
+        {
+            ObjectsGrabber.ObjectManager = p_BasicBeatmapObjectManager;
+        }
+    }
+
+    internal class ZenjectGrabberInstaller : Installer<ZenjectGrabberInstaller>
+    {
+        public override void InstallBindings()
+        {
+            Container.Bind<ZenjectGrabber>().AsSingle().NonLazy();
+        }
+    }
+
 }

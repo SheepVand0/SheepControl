@@ -65,6 +65,11 @@ namespace SheepControl.TUtils
             return l_lastGM;
         }
 
+        public static void AnimateCutout(this NoteControllerBase p_NoteController, float p_Start, float p_End, float p_Duration)
+        {
+            p_NoteController.GetComponent<BaseNoteVisuals>().AnimateCutout(p_End, p_Start, p_Duration);
+        }
+
         private static IEnumerator Delay(IEnumerator p_Coroutine, float p_Seconds)
         {
             yield return new WaitForSeconds(p_Seconds);

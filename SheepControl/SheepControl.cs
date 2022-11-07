@@ -25,6 +25,9 @@ using TMPro;
 using IPA.Logging.Printers;
 using SheepControl.Core;
 using static RankModel;
+using BeatSaberPlus.SDK.Game;
+using Zenject;
+using System.Reflection;
 
 namespace SheepControl
 {
@@ -289,6 +292,31 @@ namespace SheepControl
                 ObjectsGrabber.CallbacksController.ResetCallbackController();
             }
 
+        }
+    }
+
+    [HarmonyPatch(typeof(StandardGameplayInstaller), nameof(StandardGameplayInstaller.InstallBindings))]
+    public static class OnMenuInstallerPatch
+    {
+        private static void Postfix(StandardGameplayInstaller __instance)
+        {
+            try
+            {
+                //On Menu Settings Install installing Leaderboard Bindings
+                DiContainer l_Container = __instance.GetContainer();
+                ZenjectGrabberInstaller.Install(l_Container);
+            }
+            catch (Exception p_E)
+            {
+                Plugin.Log.Error("Error during binding Leaderboard (GuildSaberLeaderboard)");
+                Plugin.Log.Error($"Here the stacktrace : {p_E}");
+            }
+        }
+
+        public static readonly PropertyInfo m_ContainerPropertyInfo = typeof(MonoInstallerBase).GetProperty("Container", BindingFlags.Instance | BindingFlags.NonPublic);
+        public static DiContainer GetContainer(this MonoInstallerBase p_MonoInstallerBase)
+        {
+            return (DiContainer)m_ContainerPropertyInfo.GetValue(p_MonoInstallerBase);
         }
     }
 }

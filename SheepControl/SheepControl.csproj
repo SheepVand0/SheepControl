@@ -238,10 +238,13 @@
   <ItemGroup>
     <Compile Include="API\ScoreSaberAPI.cs" />
     <Compile Include="Bundle\ObamiumLoader.cs" />
+    <Compile Include="Core\BeatmapManager.cs" />
     <Compile Include="Core\CommandHandler.cs" />
     <Compile Include="Core\Commands.cs" />
     <Compile Include="Core\ObjectsGrabber.cs" />
+    <Compile Include="Core\Shaffuru.cs" />
     <Compile Include="Harmony\HarmonyPatches.cs" />
+    <Compile Include="Harmony\ShitPatches.cs" />
     <Compile Include="ModConfig.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Configuration\PluginConfig.cs" />

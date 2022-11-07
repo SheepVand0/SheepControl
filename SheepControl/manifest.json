@@ -3,7 +3,7 @@
   "id": "SheepControl",
   "name": "SheepControl",
   "author": "A lovely sheep",
-  "version": "0.2.9",
+  "version": "0.3.5",
   "description": "",
   "gameVersion": "1.18.3",
   "dependsOn": {

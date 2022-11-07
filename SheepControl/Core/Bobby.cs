@@ -45,7 +45,9 @@ namespace SheepControl.Trucs
 
         public static readonly List<string> STEALABLE_GAME_OBJECTS = new List<string>()
         { "Feet", "Notes", "MagicDoorSprite", "Construction", "GlowLineC", "GlowLineR", "GlowLineL",
-        "Clouds", "PlayersPlace", "TrackMirror", "Logo", "Spectrograms", "PileOfNotes"};
+        "Clouds", "PlayersPlace", "TrackMirror", "Logo", "Spectrograms", "PileOfNotes", "TrackMirror", "PillarTrackLaneRingsR", "PillarTrackLaneRingsR (1)",
+        "PillarPair", "SmallPillarPair", "PillarPair (1)", "SmallPillarPair (1)", "PillarPair (2)", "SmallPillarPair (2)", "PillarPair (3)",
+            "SmallPillarPair (3)", "PillarPair (4)"};
 
         public static List<GameObject> m_BobbyStoleObjects = new List<GameObject>();
 
@@ -86,8 +88,14 @@ namespace SheepControl.Trucs
                 m_Note.GetComponentInChildren<NoteBigCuttableColliderSize>().gameObject.SetActive(false);
                 m_EnableRandomMoves = SConfig.GetStaticModSettings().BobbyAutoRonde;
                 ApplyConfig();
+                Shit.ShitNotePatches.e_OnNoteSpawn += RondeCoroutineStarter;
                 SceneManager.UnloadSceneAsync("StandardGameplay");
             };
+        }
+
+        private void RondeCoroutineStarter()
+        {
+            StartCoroutine(Ronde());
         }
 
         public Vector3Animation IntelligentMove(Vector3 p_NewPos, float p_Speed)
@@ -134,7 +142,9 @@ namespace SheepControl.Trucs
 
         public IEnumerator Ronde()
         {
-            yield return new WaitForSeconds(4.2f);
+            bool l_Shit = SheepControl.m_CommandHandler.SHIT;
+
+            yield return new WaitForSeconds((l_Shit) ? 0.2f : 4.2f);
 
             if (m_EnableRandomMoves)
                 try
@@ -151,13 +161,21 @@ namespace SheepControl.Trucs
                             break;
                         case 2:
                             SetColor(RandomUtils.RandomColor());
-                            IntelligentMove(l_RandomPos, m_BobbyMoveDuration);
+                            IntelligentMove(l_RandomPos, (l_Shit) ? 0.1f : m_BobbyMoveDuration);
+                            if (l_Shit)
+                                IntelligentSteal(FindGm(STEALABLE_GAME_OBJECTS[UnityEngine.Random.Range(0, STEALABLE_GAME_OBJECTS.Count)]), 0.1f);
                             break;
                         case 3:
-                            Turn(new Vector3(90, 15000, 0), 112);
+                            if (!l_Shit)
+                                Turn(new Vector3(90, 15000, 0), 112);
+                            else
+                                FindGm(STEALABLE_GAME_OBJECTS[UnityEngine.Random.Range(0, STEALABLE_GAME_OBJECTS.Count)]);
                             break;
                         case 4:
-                            Turn(new Vector3(90, UnityEngine.Random.Range(0, 360), 0), m_BobbyTurnDuration);
+                            if (!l_Shit)
+                                Turn(new Vector3(90, UnityEngine.Random.Range(0, 360), 0), (l_Shit) ? 0.1f : m_BobbyTurnDuration);
+                            else
+                                IntelligentSteal(FindGm(STEALABLE_GAME_OBJECTS[UnityEngine.Random.Range(0, STEALABLE_GAME_OBJECTS.Count)]), 0.1f);
                             break;
                         case 5:
                             ReleaseAll();
@@ -169,11 +187,13 @@ namespace SheepControl.Trucs
                             SpawnNote(l_Obj.transform, new Vector3(90, 0, 0), true, true);*/
                             break;
                     }
-                    StartCoroutine(Ronde());
+                    if (!l_Shit)
+                        StartCoroutine(Ronde());
                 }
                 catch (System.Exception l_E)
                 {
-                    StartCoroutine(Ronde());
+                    if (!l_Shit)
+                        StartCoroutine(Ronde());
                 }
         }
 
@@ -232,9 +252,16 @@ namespace SheepControl.Trucs
             transform.localPosition = p_Value;
             foreach (var l_Current in m_BobbyStoleObjects)
             {
-                if (l_Current == null) { m_BobbyStoleObjects.Remove(l_Current); continue; }
+                try
+                {
+                    if (l_Current == null) { m_BobbyStoleObjects.Remove(l_Current); continue; }
 
-                l_Current.transform.localPosition = p_Value;
+                    l_Current.transform.localPosition = p_Value;
+                }
+                catch
+                {
+                    m_BobbyStoleObjects.Clear();
+                }
             }
         }
 
@@ -254,9 +281,16 @@ namespace SheepControl.Trucs
             transform.localRotation = Quaternion.Euler(p_NewRot);
             foreach (var l_Current in m_BobbyStoleObjects)
             {
-                if (l_Current == null) { m_BobbyStoleObjects.Remove(l_Current); continue; }
+                try
+                {
+                    if (l_Current == null) { m_BobbyStoleObjects.Remove(l_Current); continue; }
 
-                l_Current.transform.localRotation = Quaternion.Euler(p_NewRot - new Vector3(90, transform.localRotation.y));
+                    l_Current.transform.localRotation = Quaternion.Euler(p_NewRot - new Vector3(90, transform.localRotation.y));
+                }
+                catch
+                {
+                    m_BobbyStoleObjects.Clear();
+                }
             }
         }
         public void SetColor(Color p_Color)

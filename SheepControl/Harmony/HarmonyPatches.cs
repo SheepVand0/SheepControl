@@ -231,7 +231,7 @@ namespace SheepControl
     {
         private static void Postfix(ObstacleController __instance, ref StretchableObstacle ____stretchableObstacle)
         {
-            if (SheepControl.m_CommandHandler.RandomColorWalls)
+            if (SheepControl.m_CommandHandler.RandomColorWalls || SheepControl.m_CommandHandler.SHIT)
             {
                 //var l_streachableObstacle = __instance.GetField<StretchableObstacle, ObstacleController>("_stretchableObstacle");
 
