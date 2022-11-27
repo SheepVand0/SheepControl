@@ -1,1 +1,1 @@
-0.3.5;https://github.com/SheepVand0/SheepControl/blob/main/Updates/SheepControl.dll?raw=true
+0.3.7;https://github.com/SheepVand0/SheepControl/blob/main/Updates/SheepControl.dll?raw=true
