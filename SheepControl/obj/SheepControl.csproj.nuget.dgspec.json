@@ -1,21 +1,21 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\user\\Documents\\GitHub\\SheepControl\\SheepControl\\SheepControl.csproj": {}
+    "C:\\Users\\lphel\\Documents\\GitHub\\SheepControl\\SheepControl\\SheepControl.csproj": {}
   },
   "projects": {
-    "C:\\Users\\user\\Documents\\GitHub\\SheepControl\\SheepControl\\SheepControl.csproj": {
+    "C:\\Users\\lphel\\Documents\\GitHub\\SheepControl\\SheepControl\\SheepControl.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\user\\Documents\\GitHub\\SheepControl\\SheepControl\\SheepControl.csproj",
+        "projectUniqueName": "C:\\Users\\lphel\\Documents\\GitHub\\SheepControl\\SheepControl\\SheepControl.csproj",
         "projectName": "SheepControl",
-        "projectPath": "C:\\Users\\user\\Documents\\GitHub\\SheepControl\\SheepControl\\SheepControl.csproj",
-        "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\user\\Documents\\GitHub\\SheepControl\\SheepControl\\obj\\",
+        "projectPath": "C:\\Users\\lphel\\Documents\\GitHub\\SheepControl\\SheepControl\\SheepControl.csproj",
+        "packagesPath": "C:\\Users\\lphel\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\lphel\\Documents\\GitHub\\SheepControl\\SheepControl\\obj\\",
         "projectStyle": "PackageReference",
         "skipContentFileWrite": true,
         "configFilePaths": [
-          "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\lphel\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -45,6 +45,9 @@
       },
       "runtimes": {
         "win": {
+          "#import": []
+        },
+        "win-arm64": {
           "#import": []
         },
         "win-x64": {

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SheepControl.UI
 {
-    internal class CustomFlowCoordinator : BeatSaberPlus.SDK.UI.ViewFlowCoordinator<CustomFlowCoordinator>
+    /*internal class CustomFlowCoordinator : BeatSaberPlus.SDK.UI.HMUIViewFlowCoordinator<CustomFlowCoordinator>
     {
         public override string Title => "Play menu";
 
@@ -16,13 +16,15 @@ namespace SheepControl.UI
         {
             return (null, null, null);
         }
-    }
+    }*/
 
-    internal class PlayerViewController : ViewController<PlayerViewController>
+    /*internal class PlayerViewController : ViewController<PlayerViewController>
     {
+
+
         protected override string GetViewContentDescription()
         {
             return "<bg></bg>";
         }
-    }
+    }*/
 }

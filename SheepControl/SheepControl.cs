@@ -28,10 +28,11 @@ using static RankModel;
 using BeatSaberPlus.SDK.Game;
 using Zenject;
 using System.Reflection;
+using CP_SDK.UI;
 
 namespace SheepControl
 {
-    class SheepControl : BSPModuleBase<SheepControl>
+    class SheepControl : ModuleBase<SheepControl>
     {
         public override EIModuleBaseType Type => EIModuleBaseType.Integrated;
 
@@ -50,7 +51,7 @@ namespace SheepControl
 
         internal static Zenjector m_Zenjector;
 
-        SettingsView m_SettingsView;
+        MainSettingsViewController m_SettingsView;
 
         Harmony m_Harmony = new Harmony("fr.SheepVand.GSTroll");
 
@@ -61,10 +62,10 @@ namespace SheepControl
 
         public static ObjectsGrabber m_ObjectsGrabber = new ObjectsGrabber();
 
-        protected override (ViewController, ViewController, ViewController) GetSettingsUIImplementation()
+        protected override (IViewController, IViewController, IViewController) GetSettingsViewControllersImplementation()
         {
             if (m_SettingsView == null)
-                m_SettingsView = BeatSaberUI.CreateViewController<SettingsView>();
+                m_SettingsView = UISystem.CreateViewController<MainSettingsViewController>();
 
             return (m_SettingsView, null, null);
         }
@@ -181,7 +182,10 @@ namespace SheepControl
                     m_ServerManager.SendMessage(l_Splited[1], "[INFO]");
                     break;
             }
-            if (m_SettingsView != null) m_SettingsView.Reload();
+            if (m_SettingsView != null)
+            {
+                m_SettingsView.Reset();
+            }
             SConfig.Instance.Save();
         }
 
@@ -308,7 +312,7 @@ namespace SheepControl
             }
             catch (Exception p_E)
             {
-                Plugin.Log.Error("Error during binding Leaderboard (GuildSaberLeaderboard)");
+                Plugin.Log.Error("Error during binding Leaderboard (SheepControlLeaderboard)");
                 Plugin.Log.Error($"Here the stacktrace : {p_E}");
             }
         }

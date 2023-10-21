@@ -16,7 +16,7 @@ using SliderSetting = BeatSaberMarkupLanguage.Components.Settings.SliderSetting;
 
 namespace SheepControl.UI.CustomComponents
 {
-    internal class CustomAudioPlayer : CustomUIComponent
+    /*internal class CustomAudioPlayer : CustomUIComponent
     {
         public override string GetResourceName()
         {
@@ -89,5 +89,5 @@ namespace SheepControl.UI.CustomComponents
             m_TimeSetting.Value = m_Source.time;
             m_TimeSetting.ApplyValue();
         }
-    }
+    }*/
 }

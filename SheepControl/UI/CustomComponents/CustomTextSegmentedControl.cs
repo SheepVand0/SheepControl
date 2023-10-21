@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace SheepControl.UI.CustomComponents
 {
-    internal class CustomTextSegmentedControl
+    /*internal class CustomTextSegmentedControl
     {
         List<GameObject> m_Tabs = new List<GameObject>();
 
@@ -36,5 +36,5 @@ namespace SheepControl.UI.CustomComponents
 
             if (m_Tabs.ElementAt(0) != null) m_Tabs.ElementAt(0).gameObject.SetActive(true);
         }
-    }
+    }*/
 }

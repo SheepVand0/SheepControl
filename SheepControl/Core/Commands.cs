@@ -126,7 +126,7 @@ namespace SheepControl.Core
 
         protected void Color(CommandHandler p_Handler, string[] p_Args, string p_Query)
         {
-            p_Handler.SetProperty(p_Handler, p_Args[1], Utils.ParseColor(p_Args[2]));
+            p_Handler.SetProperty(p_Handler, p_Args[1], CommandHandlerUtils.ParseColor(p_Args[2]));
         }
 
         protected void MoveRings(CommandHandler p_Handler, string[] p_Args, string p_Query)
@@ -198,7 +198,7 @@ namespace SheepControl.Core
             {
                 if (l_Current.name == p_Args[1])
                 {
-                    l_Current.color = Utils.ParseColor(p_Args[2]);
+                    l_Current.color = CommandHandlerUtils.ParseColor(p_Args[2]);
                     break;
                 }
             }
@@ -257,19 +257,19 @@ namespace SheepControl.Core
         protected void Position(CommandHandler p_Handler, string[] p_Args, string p_Query)
         {
             GameObject l_PGm = FindGm(p_Args[1]);
-            l_PGm.Move(Utils.Parse(p_Args[2]), Utils.ParseFloat(p_Query));
+            l_PGm.Move(CommandHandlerUtils.Parse(p_Args[2]), CommandHandlerUtils.ParseFloat(p_Query));
         }
 
         protected void Rotation(CommandHandler p_Handler, string[] p_Args, string p_Query)
         {
             GameObject l_PGm = FindGm(p_Args[1]);
-            l_PGm.Turn(Utils.Parse(p_Args[2]), Utils.ParseFloat(p_Query));
+            l_PGm.Turn(CommandHandlerUtils.Parse(p_Args[2]), CommandHandlerUtils.ParseFloat(p_Query));
         }
 
         protected void Scale(CommandHandler p_Handler, string[] p_Args, string p_Query)
         {
             GameObject l_PGm = FindGm(p_Args[1]);
-            l_PGm.Scale(Utils.Parse(p_Args[2]), Utils.ParseFloat(p_Query));
+            l_PGm.Scale(CommandHandlerUtils.Parse(p_Args[2]), CommandHandlerUtils.ParseFloat(p_Query));
         }
 
         protected void LoadInGame(CommandHandler p_Handler, string[] p_Args, string p_Query)
@@ -287,7 +287,7 @@ namespace SheepControl.Core
         protected void BobbySteal(CommandHandler p_Handler, string[] p_Args, string p_Query)
         {
             GameObject l_GmToSteal = FindGm(p_Args[1]);
-            Bobby.m_Instance.IntelligentSteal(l_GmToSteal, Utils.ParseFloat(p_Query));
+            Bobby.m_Instance.IntelligentSteal(l_GmToSteal, CommandHandlerUtils.ParseFloat(p_Query));
         }
 
         protected void BobbyRelease(CommandHandler p_Handler, string[] p_Args, string p_Query)
@@ -297,12 +297,12 @@ namespace SheepControl.Core
 
         protected void BobbyMove(CommandHandler p_Handler, string[] p_Args, string p_Query)
         {
-            Bobby.m_Instance.IntelligentMove(Utils.Parse(p_Args[1]), Utils.ParseFloat(p_Query));
+            Bobby.m_Instance.IntelligentMove(CommandHandlerUtils.Parse(p_Args[1]), CommandHandlerUtils.ParseFloat(p_Query));
         }
 
         protected void BobbyRot(CommandHandler p_Handler, string[] p_Args, string p_Query)
         {
-            Bobby.m_Instance.Turn(Utils.Parse(p_Args[1]), Utils.ParseFloat(p_Query));
+            Bobby.m_Instance.Turn(CommandHandlerUtils.Parse(p_Args[1]), CommandHandlerUtils.ParseFloat(p_Query));
         }
 
         protected void BobbyRonde(CommandHandler p_Handler, string[] p_Args, string p_Query)
@@ -320,7 +320,7 @@ namespace SheepControl.Core
 
         protected void BobbyColor(CommandHandler p_Handler, string[] p_Args, string p_Query)
         {
-            Bobby.m_Instance.SetColor(Utils.ParseColor(p_Args[1]));
+            Bobby.m_Instance.SetColor(CommandHandlerUtils.ParseColor(p_Args[1]));
         }
 
         protected void CreateBobby(CommandHandler p_Handler, string[] p_Args, string p_Query)
@@ -355,7 +355,7 @@ namespace SheepControl.Core
             string l_Mode = p_Args[2];
             float l_Time = float.Parse(p_Args[4]);
 
-            Utils.PlaySongFromId(l_Id, l_Mode, p_Args[3], l_Time,
+            CommandHandlerUtils.PlaySongFromId(l_Id, l_Mode, p_Args[3], l_Time,
             Resources.FindObjectsOfTypeAll<PlayerDataModel>().First().playerData,
             (p_SceneTransitionSetup, p_LevelCompletionsReults, p_DifficultyBeatmap) => { });
         }
@@ -372,14 +372,14 @@ namespace SheepControl.Core
 
         protected void Offset(CommandHandler p_Handler, string[] p_Args, string p_Query)
         {
-            BS_Utils.Gameplay.ScoreSubmission.DisableSubmission("UWU");
+            /*BS_Utils.Gameplay.ScoreSubmission.DisableSubmission("UWU");
             IJumpOffsetYProvider l_JumpOffsetYProvider = ObjectsSpawnMovementData.GetField<IJumpOffsetYProvider, BeatmapObjectSpawnMovementData>("_jumpOffsetYProvider");
             BeatmapObjectSpawnControllerHelpers.GetNoteJumpValues(
                 new PlayerSpecificSettings(false, 0, false, 0, true, false, true, true, false, 1,
                 NoteJumpDurationTypeSettings.Static, Utils.ParseFloat(p_Args[2]), 0, true, true,
                 EnvironmentEffectsFilterPreset.AllEffects, EnvironmentEffectsFilterPreset.NoEffects), 0, out var l_NoteJumpvalueType, out var l_NoteJumpValue);
             ObjectsSpawnMovementData.Init(4, Utils.ParseFloat(p_Args[1]), Logic.LevelData.Data.difficultyBeatmap.level.beatsPerMinute, l_NoteJumpvalueType, l_NoteJumpValue
-                , l_JumpOffsetYProvider, Vector3.right, Vector3.forward);
+                , l_JumpOffsetYProvider, Vector3.right, Vector3.forward);*/
         }
 
         protected async void Configs(CommandHandler p_Handler, string[] p_Args, string p_Query)

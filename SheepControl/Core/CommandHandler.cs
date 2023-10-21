@@ -99,10 +99,10 @@ namespace SheepControl
 
             switch (BeatSaberPlus.SDK.Game.Logic.ActiveScene)
             {
-                case Logic.SceneType.Menu:
+                case Logic.ESceneType.Menu:
                     if (!SConfig.GetStaticModSettings().IsCommandsEnabledInMenu) return;
                     break;
-                case Logic.SceneType.Playing:
+                case Logic.ESceneType.Playing:
                     if (!SConfig.GetStaticModSettings().AskForCommands)
                     {
                         if (!SConfig.GetStaticModSettings().IsCommandsEnabledInGame) return;
@@ -176,8 +176,8 @@ namespace SheepControl
             try { p_Value = bool.Parse((string)p_Value); } catch { }
             try { p_Value = int.Parse((string)p_Value); } catch { }
             try { p_Value = float.Parse((string)p_Value); } catch { }
-            try { p_Value = Utils.Parse((string)p_Value); } catch { }
-            try { p_Value = Utils.RotParse((string)p_Value); } catch { }
+            try { p_Value = CommandHandlerUtils.Parse((string)p_Value); } catch { }
+            try { p_Value = CommandHandlerUtils.RotParse((string)p_Value); } catch { }
 
             l_Property.SetValue(p_Target, p_Value);
         }
@@ -252,7 +252,7 @@ namespace SheepControl
         }
     }
 
-    public static class Utils
+    public static class CommandHandlerUtils
     {
         public static readonly FieldAccessor<BeatmapDataItem, float>.Accessor _BeatMapDataItemTimeAccessor = FieldAccessor<BeatmapDataItem, float>.GetAccessor($"<{nameof(BeatmapDataItem.time)}>k__BackingField");
 
@@ -273,7 +273,7 @@ namespace SheepControl
 
                 switch (Logic.ActiveScene)
                 {
-                    case Logic.SceneType.Menu:
+                    case Logic.ESceneType.Menu:
                         BeatmapDifficulty l_Difficulty = Levels.SerializedToDifficulty(p_SerializedDifficulty);
                         BeatmapCharacteristicSO l_BeatmapCharacteristics = null;
                         IDifficultyBeatmap l_DiffBeatmap = null;
@@ -294,7 +294,7 @@ namespace SheepControl
                             p_PlayCallback.Invoke(p_StandardLevelScenesTransition, p_LevelCompletionResults, p_DifficultyBeatmap);
                         });
                         break;
-                    case Logic.SceneType.Playing:
+                    case Logic.ESceneType.Playing:
                         await BeatmapManager.SwitchBeatmap(p_Beatmap, p_Mode, p_SerializedDifficulty, p_Time, 0.25f);
                         break;
                 }

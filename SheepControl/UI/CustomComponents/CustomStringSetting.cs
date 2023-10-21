@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace SheepControl.UI.CustomComponents
 {
-    internal class CustomStringSetting : CustomUIComponent
+    /*internal class CustomStringSetting : CustomUIComponent
     {
         public override string GetResourceName()
         {
@@ -80,5 +80,5 @@ namespace SheepControl.UI.CustomComponents
 
             return p_Value.Substring(0, p_CharChounts) + "...";
         }
-    }
+    }*/
 }

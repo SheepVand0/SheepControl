@@ -16,7 +16,7 @@ using SheepControl.TUtils;
 namespace SheepControl
 {
 
-    [HarmonyPatch(typeof(CoreGameHUDController), nameof(CoreGameHUDController.Start))]
+    [HarmonyPatch(typeof(CoreGameHUDController), nameof(CoreGameHUDController.Initialize))]
     class Rank
     {
 

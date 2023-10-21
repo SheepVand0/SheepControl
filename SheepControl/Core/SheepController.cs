@@ -192,7 +192,7 @@ namespace SheepControl
             Logic.OnSceneChange += (p_Scene) =>
             {
                 StartCoroutine(RondBobby());
-                if (p_Scene == Logic.SceneType.Menu)
+                if (p_Scene == Logic.ESceneType.Menu)
                     CommandHandler.IsCommandEnabled = true;
 
             };

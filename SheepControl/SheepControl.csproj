@@ -168,13 +168,28 @@
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+      <Private>False</Private>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+      <Private>False</Private>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
     <Reference Include="UnityEngine.InputModule">
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.InputModule.dll</HintPath>
+      <Private>False</Private>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="UnityEngine.StreamingModule">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.StreamingModule.dll</HintPath>
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
@@ -252,6 +267,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Bobby.cs" />
     <Compile Include="SheepControl.cs" />
+    <Compile Include="UI\CustomComponents\CBadWord.cs" />
+    <Compile Include="UI\CustomComponents\CBannedCommand.cs" />
+    <Compile Include="UI\CustomComponents\CBannedQuery.cs" />
+    <Compile Include="UI\CustomComponents\CWhiteUser.cs" />
     <Compile Include="UI\CustomComponents\CustomAudioPlayer.cs" />
     <Compile Include="UI\CustomComponents\CustomKeyboard.cs" />
     <Compile Include="UI\CustomComponents\CustomStringSetting.cs" />
@@ -260,8 +279,16 @@
     <Compile Include="UI\CustomComponents\CustomVideoPlayer.cs" />
     <Compile Include="UI\CustomComponents\FlyingText.cs" />
     <Compile Include="UI\CustomFlowCoordinator.cs" />
+    <Compile Include="UI\Defaults\GSSecondaryButton.cs" />
+    <Compile Include="UI\Defaults\GSSlider.cs" />
+    <Compile Include="UI\Defaults\GSText.cs" />
+    <Compile Include="UI\Defaults\GSTextInput.cs" />
+    <Compile Include="UI\Defaults\GSToggleSetting.cs" />
+    <Compile Include="UI\MainSettingsViewController.cs" />
     <Compile Include="UI\SettingsView.cs" />
     <Compile Include="Core\Animations.cs" />
+    <Compile Include="Utils\AssemblyUtils.cs" />
+    <Compile Include="Utils\TextureUtils.cs" />
     <Compile Include="Utils\Utils.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -278,6 +305,7 @@
     <EmbeddedResource Include="UI\Views\Text.bsml" />
     <EmbeddedResource Include="UI\Views\VideoPlayer.bsml" />
     <EmbeddedResource Include="UI\Views\CustomAudioPlayer.bsml" />
+    <EmbeddedResource Include="Resources\Teko-Medium.ttf" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BeatSaberModdingTools.Tasks">

@@ -30,7 +30,7 @@ namespace SheepControl.Core
 
             Logic.OnSceneChange += (p_Scene) =>
             {
-                if (p_Scene == Logic.SceneType.Playing)
+                if (p_Scene == Logic.ESceneType.Playing)
                 {
                     s_OldBeatmapDudration = Logic.LevelData.Data.difficultyBeatmap.level.songDuration;
                 }
@@ -57,7 +57,7 @@ namespace SheepControl.Core
         {
             await Task.Delay(UnityEngine.Random.Range(10000, 40000));
 
-            if (Logic.ActiveScene != Logic.SceneType.Playing) { Loop(); return; }
+            if (Logic.ActiveScene != Logic.ESceneType.Playing) { Loop(); return; }
 
             if (BeatmapManager.s_ChangingBeatmap) { Loop(); return; }
 

@@ -27,7 +27,7 @@ namespace SheepControl.Trucs
 
         GameObject m_Note;
 
-        public SettingsView m_SettingsView;
+        internal MainSettingsViewController m_SettingsView;
 
         AudioClip m_WoolSound;
 
@@ -199,7 +199,7 @@ namespace SheepControl.Trucs
 
         public void SpawnNote(Transform p_Parent, Vector3 p_Rotation, bool p_DisableSmall, bool p_DisableBig)
         {
-            if (BeatSaberPlus.SDK.Game.Logic.ActiveScene == Logic.SceneType.Playing) return;
+            if (BeatSaberPlus.SDK.Game.Logic.ActiveScene == Logic.ESceneType.Playing) return;
 
             GameObject l_Note = null;
             SceneManager.LoadSceneAsync("StandardGameplay", LoadSceneMode.Additive).completed += (_) =>

@@ -34,7 +34,7 @@ using HMUI;
 
 namespace SheepControl.UI
 {
-    class WhiteUser
+    /*class WhiteUser
     {
         SettingsView m_Parent = null;
 
@@ -239,10 +239,6 @@ namespace SheepControl.UI
 
     public class SettingsView : ViewController<SettingsView>
     {
-        protected override string GetViewContentDescription()
-        {
-            return Utilities.GetResourceContent(Assembly.GetExecutingAssembly(), "SheepControl.UI.Views.SettingsView.bsml");
-        }
 
         internal static SettingsView m_Instance;
 
@@ -316,6 +312,8 @@ namespace SheepControl.UI
         protected override sealed void OnViewCreation()
         {
             m_Instance = this;
+
+
 
             BSMLAction l_EnableBobbyMovesAction = new BSMLAction(this, this.GetType().GetMethod(nameof(OnBobbyMoveEnabled), System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic));
             BSMLAction l_SliderActions = new BSMLAction(this, this.GetType().GetMethod(nameof(OnSliderChanged), System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic));
@@ -529,5 +527,5 @@ namespace SheepControl.UI
                 };
             }
         }
-    }
+    }*/
 }
