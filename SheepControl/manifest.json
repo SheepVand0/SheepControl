@@ -3,10 +3,11 @@
   "id": "SheepControl",
   "name": "SheepControl",
   "author": "A lovely sheep",
-  "version": "0.3.5",
+  "version": "0.5.0",
   "description": "",
-  "gameVersion": "1.18.3",
+  "gameVersion": "1.29.0",
   "dependsOn": {
-    "BSIPA": "^4.2.0"
+    "BSIPA": "^4.2.0",
+    "Bobby": "0.1.0"
   }
 }
