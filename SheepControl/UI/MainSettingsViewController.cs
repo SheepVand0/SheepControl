@@ -45,6 +45,11 @@ namespace SheepControl.UI
              .BuildUI(transform);
 
             Instance = this;
+
+            UpdateWhitelist();
+            UpdateBadWords();
+            UpdateBannedCommands();
+            UpdateBannedCommands();
         }
 
         //////////////////////////////////////////////////////////
@@ -56,18 +61,22 @@ namespace SheepControl.UI
         private IXUIElement BuildWhitelistTab()
         {
             return XUIVLayout.Make(
-                        XUIVLayout.Make(
+                        XUIHLayout.Make(
                             XUIVScrollView.Make()
                             .Bind(ref m_WhitelistScrollView)
-                        ).SetMinHeight(40)
+                        ).SetWidth(110)
+                         .SetHeight(40)
+                         .SetSpacing(0)
+                         .SetPadding(0)
                          .OnReady(x => x.CSizeFitter.horizontalFit = x.CSizeFitter.verticalFit = UnityEngine.UI.ContentSizeFitter.FitMode.Unconstrained)
-                         .OnReady(x => x.HOrVLayoutGroup.childForceExpandHeight = x.HOrVLayoutGroup.childControlWidth = true),
+                         .OnReady(x => x.HOrVLayoutGroup.childForceExpandWidth = true)
+                         .OnReady(x => x.HOrVLayoutGroup.childForceExpandHeight = true),
                         GSSecondaryButton.Make("Add", 20, 7, p_OnClick: () =>
                         {
                             SConfig.Instance.WhitelistNames.Add($"Name{SConfig.Instance.WhitelistNames.Count}");
                             UpdateWhitelist();
                         })
-                    );
+                    ).SetHeight(40);
         }
 
         public void UpdateWhitelist()
@@ -83,7 +92,7 @@ namespace SheepControl.UI
                 if (l_i > m_WhiteUsersCells.Count - 1)
                 {
                     var l_WhiteUser = CWhiteUser.Make();
-                    l_WhiteUser.BuildUI(m_WhitelistScrollView.Element.Container.transform);
+                    l_WhiteUser.BuildUI(m_WhitelistScrollView.Element.Container);
                     m_WhiteUsersCells.Add(l_WhiteUser);
                 }
 
@@ -101,18 +110,22 @@ namespace SheepControl.UI
         private IXUIElement BuildBadWordsTab()
         {
             return XUIVLayout.Make(
-                        XUIVLayout.Make(
+                        XUIHLayout.Make(
                             XUIVScrollView.Make()
                             .Bind(ref m_BadWordsScrollView)
-                        ).SetMinHeight(40)
+                        ).SetWidth(110)
+                         .SetHeight(40)
+                         .SetSpacing(0)
+                         .SetPadding(0)
                          .OnReady(x => x.CSizeFitter.horizontalFit = x.CSizeFitter.verticalFit = UnityEngine.UI.ContentSizeFitter.FitMode.Unconstrained)
-                         .OnReady(x => x.HOrVLayoutGroup.childForceExpandHeight = x.HOrVLayoutGroup.childControlWidth = true),
+                         .OnReady(x => x.HOrVLayoutGroup.childForceExpandWidth = true)
+                         .OnReady(x => x.HOrVLayoutGroup.childForceExpandHeight = true),
                         GSSecondaryButton.Make("Add", 20, 7, p_OnClick: () =>
                         {
                             SConfig.Instance.BannedWords.Add($"Name{SConfig.Instance.BannedWords.Count}");
                             UpdateBadWords();
                         })
-                    );
+                    ).SetHeight(40);
         }
 
         public void UpdateBadWords()
@@ -128,7 +141,7 @@ namespace SheepControl.UI
                 if (l_i > m_BadWordsCells.Count - 1)
                 {
                     var l_BadWord = CBadWord.Make();
-                    l_BadWord.BuildUI(m_BadWordsScrollView.Element.Container.transform);
+                    l_BadWord.BuildUI(m_BadWordsScrollView.Element.Container);
                     m_BadWordsCells.Add(l_BadWord);
                 }
 
@@ -146,23 +159,27 @@ namespace SheepControl.UI
         private IXUIElement BuildBannedCommandsTab()
         {
             return XUIVLayout.Make(
-                        XUIVLayout.Make(
+                        XUIHLayout.Make(
                             XUIVScrollView.Make()
                             .Bind(ref m_BannedCommandsScrollView)
-                        ).SetMinHeight(40)
+                        ).SetWidth(110)
+                         .SetHeight(40)
+                         .SetSpacing(0)
+                         .SetPadding(0)
                          .OnReady(x => x.CSizeFitter.horizontalFit = x.CSizeFitter.verticalFit = UnityEngine.UI.ContentSizeFitter.FitMode.Unconstrained)
-                         .OnReady(x => x.HOrVLayoutGroup.childForceExpandHeight = x.HOrVLayoutGroup.childControlWidth = true),
+                         .OnReady(x => x.HOrVLayoutGroup.childForceExpandWidth = true)
+                         .OnReady(x => x.HOrVLayoutGroup.childForceExpandHeight = true),
                         GSSecondaryButton.Make("Add", 20, 7, p_OnClick: () =>
                         {
                             SConfig.Instance.BannedCommands.Add($"Name{SConfig.Instance.BannedCommands.Count}");
                             UpdateBannedCommands();
                         })
-                    );
+                    ).SetHeight(40);
         }
 
         public void UpdateBannedCommands()
         {
-            foreach (var l_Index in m_BadWordsCells)
+            foreach (var l_Index in m_BannedCommandsCells)
             {
                 l_Index.SetActive(false);
             }
@@ -173,7 +190,7 @@ namespace SheepControl.UI
                 if (l_i > m_BannedCommandsCells.Count - 1)
                 {
                     var l_BannedCommand = CBannedCommand.Make();
-                    l_BannedCommand.BuildUI(m_BannedCommandsScrollView.Element.Container.transform);
+                    l_BannedCommand.BuildUI(m_BannedCommandsScrollView.Element.Container);
                     m_BannedCommandsCells.Add(l_BannedCommand);
                 }
 
@@ -191,23 +208,27 @@ namespace SheepControl.UI
         private IXUIElement BuildBannedQueriesTab()
         {
             return XUIVLayout.Make(
-                        XUIVLayout.Make(
+                        XUIHLayout.Make(
                             XUIVScrollView.Make()
                             .Bind(ref m_BannedQueriesScrollView)
-                        ).SetMinHeight(40)
+                        ).SetWidth(110)
+                         .SetHeight(40)
+                         .SetSpacing(0)
+                         .SetPadding(0)
                          .OnReady(x => x.CSizeFitter.horizontalFit = x.CSizeFitter.verticalFit = UnityEngine.UI.ContentSizeFitter.FitMode.Unconstrained)
-                         .OnReady(x => x.HOrVLayoutGroup.childForceExpandHeight = x.HOrVLayoutGroup.childControlWidth = true),
+                         .OnReady(x => x.HOrVLayoutGroup.childForceExpandWidth = true)
+                         .OnReady(x => x.HOrVLayoutGroup.childForceExpandHeight = true),
                         GSSecondaryButton.Make("Add", 20, 7, p_OnClick: () =>
                         {
                             SConfig.Instance.BannedQueries.Add($"Name{SConfig.Instance.BannedQueries.Count}");
                             UpdateBannedQueries();
                         })
-                    );
+                    ).SetHeight(40);
         }
 
         public void UpdateBannedQueries()
         {
-            foreach (var l_Index in m_BadWordsCells)
+            foreach (var l_Index in m_BannedQueriesCells)
             {
                 l_Index.SetActive(false);
             }
@@ -218,7 +239,7 @@ namespace SheepControl.UI
                 if (l_i > m_BannedQueriesCells.Count - 1)
                 {
                     var l_Query = CBannedQuery.Make();
-                    l_Query.BuildUI(m_BannedQueriesScrollView.Element.Container.transform);
+                    l_Query.BuildUI(m_BannedQueriesScrollView.Element.Container);
                     m_BannedQueriesCells.Add(l_Query);
                 }
 
@@ -233,38 +254,6 @@ namespace SheepControl.UI
         private IXUIElement BuildOtherTab()
         {
             return XUIVLayout.Make(
-                GSText.Make("Enable Bobby's AI:"),
-                GSToggleSetting.Make()
-                    .OnValueChanged(x =>
-                    {
-                        SConfig.Instance.BobbyAutoRonde = x;
-                        SConfig.Instance.Save();
-                        UpdateBobby();
-                    }),
-                GSText.Make("Bobby's move speed:"),
-                GSSlider.Make()
-                    .OnValueChanged(x =>
-                    {
-                        SConfig.Instance.BobbyMoveDuration = 5 / x;
-                        SConfig.Instance.Save();
-                        UpdateBobby();
-                    }),
-                GSText.Make("Bobby's steal duration:"),
-                GSSlider.Make()
-                    .OnValueChanged(x =>
-                    {
-                        SConfig.Instance.BobbyStealDuration = 5 / x;
-                        SConfig.Instance.Save();
-                        UpdateBobby();
-                    }),
-                GSText.Make("Bobby's rotation speed:"),
-                GSSlider.Make()
-                    .OnValueChanged(x =>
-                    {
-                        SConfig.Instance.BobbyTurnDuration = 5 / x;
-                        SConfig.Instance.Save();
-                        UpdateBobby();
-                    }),
                 XUIHLayout.Make(
                     XUIVLayout.Make(
                         GSText.Make("Ask for commands:"),
@@ -274,6 +263,7 @@ namespace SheepControl.UI
                                 SConfig.Instance.AskForCommands = x;
                                 SConfig.Instance.Save();
                             })
+                            .SetValue(SConfig.Instance.AskForCommands, false)
                         ),
                         XUIVLayout.Make(
                             GSText.Make("Is commands enabled:"),
@@ -284,6 +274,7 @@ namespace SheepControl.UI
                                     SConfig.Instance.IsCommandsEnabledInGame = x;
                                     SConfig.Instance.Save();
                                 })
+                                .SetValue(SConfig.Instance.IsCommandsEnabledInGame, false)
                             ),
                         XUIVLayout.Make(
                             GSText.Make("Is commands enabled:"),
@@ -294,17 +285,18 @@ namespace SheepControl.UI
                                     SConfig.Instance.IsCommandsEnabledInMenu = x;
                                     SConfig.Instance.Save();
                                 })
+                                .SetValue(SConfig.Instance.IsCommandsEnabledInMenu, false)
                             )
                     )
                 );
         }
 
-        private void UpdateBobby()
+        /*private void UpdateBobby()
         {
             if (Bobby.m_Instance == null) return;
 
             Bobby.m_Instance.ApplyConfig();
-        }
+        }*/
 
         //////////////////////////////////////////////////////////
         /////////////////////////////////////////////////////////
@@ -316,17 +308,17 @@ namespace SheepControl.UI
                 {
                     SheepControl.m_CommandHandler.HandleCommand("!sudo enable RandomLights");
                 }),
-                GSSecondaryButton.Make("Force Bobby's AI", 40, 7, p_OnClick: () =>
+                /*GSSecondaryButton.Make("Force Bobby's AI", 40, 7, p_OnClick: () =>
                 {
-                    Bobby.m_Instance.StartCoroutine(Bobby.m_Instance.Ronde());
-                }),
+                    Bobby.BobbyApi.DoActionLoop();
+                }),*/
                 GSSecondaryButton.Make("Force Bobby to release objects", 40, 7, p_OnClick: () =>
                 {
-                    Bobby.m_Instance.ReleaseAll();
+                    Bobby.BobbyApi.ReleaseStolenObjects();
                 }),
                 GSSecondaryButton.Make("Reset Bobby position", 40, 7, p_OnClick: () =>
                 {
-                    Bobby.m_Instance.Reset();
+                    Bobby.BobbyApi.ResetPosition();
                 }),
                 GSSecondaryButton.Make("Reset config", 40, 7, p_OnClick: () =>
                 {

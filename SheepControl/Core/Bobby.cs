@@ -19,7 +19,7 @@ using System;
 namespace SheepControl.Trucs
 {
 
-    unsafe public class Bobby : MonoBehaviour
+    /*unsafe public class Bobby : MonoBehaviour
     {
         public static Bobby m_Instance;
 
@@ -181,10 +181,10 @@ namespace SheepControl.Trucs
                             ReleaseAll();
                             break;
                         case 6:
-                            /*GameObject l_Obj = new GameObject("BobbyNote");
+                            *//*GameObject l_Obj = new GameObject("BobbyNote");
                             l_Obj.transform.SetParent(m_Note.transform);
                             l_Obj.transform.localRotation = Quaternion.Euler(RandomUtils.RandomVector3(-180, 180));
-                            SpawnNote(l_Obj.transform, new Vector3(90, 0, 0), true, true);*/
+                            SpawnNote(l_Obj.transform, new Vector3(90, 0, 0), true, true);*//*
                             break;
                     }
                     if (!l_Shit)
@@ -322,5 +322,5 @@ namespace SheepControl.Trucs
             m_BobbyStealDuration = SConfig.GetStaticModSettings().BobbyStealDuration;
             m_BobbyTurnDuration = SConfig.GetStaticModSettings().BobbyTurnDuration;
         }
-    }
+    }*/
 }

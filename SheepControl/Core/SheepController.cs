@@ -191,7 +191,7 @@ namespace SheepControl
 
             Logic.OnSceneChange += (p_Scene) =>
             {
-                StartCoroutine(RondBobby());
+                //StartCoroutine(RondBobby());
                 if (p_Scene == Logic.ESceneType.Menu)
                     CommandHandler.IsCommandEnabled = true;
 
@@ -210,11 +210,11 @@ namespace SheepControl
             yield return null;
         }
 
-        private IEnumerator RondBobby()
+        /*private IEnumerator RondBobby()
         {
             yield return new WaitForSeconds(0.5f);
 
             Bobby.m_Instance.StartCoroutine(Bobby.m_Instance.Ronde());
-        }
+        }*/
     }
 }

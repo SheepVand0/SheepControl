@@ -195,7 +195,7 @@ namespace SheepControl
             SConfig l_Settings = SConfig.GetStaticModSettings();
             foreach (var l_Current in l_Settings.BannedWords)
                 if (p_Target.ToLower().Contains(l_Current))
-                    p_Target = "BadWord";
+                    p_Target = "*****";
             return p_Target;
         }
 

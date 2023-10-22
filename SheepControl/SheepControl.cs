@@ -36,7 +36,7 @@ namespace SheepControl
     {
         public override EIModuleBaseType Type => EIModuleBaseType.Integrated;
 
-        public override string Name => "Bobby";
+        public override string Name => "Sheep wants to be annoying";
 
         public override string Description => "Manage Mod";
 
@@ -80,17 +80,6 @@ namespace SheepControl
             else
                 m_ServerManager.Resume();
             CP_SDK.Chat.Service.Discrete_OnTextMessageReceived += OnChatMessageReceive;
-            if (Bobby.m_Instance == null)
-            {
-                new GameObject("Bobby").AddComponent<Bobby>();
-                Bobby.m_Instance.m_EnableRandomMoves = SConfig.Instance.GetModSettings().BobbyAutoRonde;
-            }
-            else
-            {
-                Bobby.m_Instance.gameObject.SetActive(true);
-                Bobby.m_Instance.m_EnableRandomMoves = SConfig.Instance.GetModSettings().BobbyAutoRonde;
-                Bobby.m_Instance.Ronde();
-            }
 
             if (SheepControlController.Instance == null)
                 new GameObject("BobbyController").AddComponent<SheepControlController>();
@@ -103,12 +92,7 @@ namespace SheepControl
         protected override void OnDisable()
         {
             CP_SDK.Chat.Service.Discrete_OnTextMessageReceived -= OnChatMessageReceive;
-            if (Bobby.m_Instance != null)
-            {
-                Bobby.m_Instance.StopAllCoroutines();
-                Bobby.m_Instance.m_EnableRandomMoves = false;
-                Bobby.m_Instance.gameObject.SetActive(false);
-            }
+
             m_ServerManager.Pause();
             m_Harmony.UnpatchSelf();
         }

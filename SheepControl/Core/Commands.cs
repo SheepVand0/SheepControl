@@ -287,55 +287,49 @@ namespace SheepControl.Core
         protected void BobbySteal(CommandHandler p_Handler, string[] p_Args, string p_Query)
         {
             GameObject l_GmToSteal = FindGm(p_Args[1]);
-            Bobby.m_Instance.IntelligentSteal(l_GmToSteal, CommandHandlerUtils.ParseFloat(p_Query));
+            Bobby.BobbyApi.Steal(l_GmToSteal);
         }
 
         protected void BobbyRelease(CommandHandler p_Handler, string[] p_Args, string p_Query)
         {
-            Bobby.m_Instance.ReleaseAll();
+            Bobby.BobbyApi.ReleaseStolenObjects();
         }
 
         protected void BobbyMove(CommandHandler p_Handler, string[] p_Args, string p_Query)
         {
-            Bobby.m_Instance.IntelligentMove(CommandHandlerUtils.Parse(p_Args[1]), CommandHandlerUtils.ParseFloat(p_Query));
+            Bobby.BobbyApi.Move(CommandHandlerUtils.Parse(p_Args[1]));
         }
 
         protected void BobbyRot(CommandHandler p_Handler, string[] p_Args, string p_Query)
         {
-            Bobby.m_Instance.Turn(CommandHandlerUtils.Parse(p_Args[1]), CommandHandlerUtils.ParseFloat(p_Query));
-        }
-
-        protected void BobbyRonde(CommandHandler p_Handler, string[] p_Args, string p_Query)
-        {
-            Bobby.m_Instance.m_EnableRandomMoves = true;
-            Bobby.m_Instance.Ronde();
+            Bobby.BobbyApi.Turn(Quaternion.Euler(CommandHandlerUtils.Parse(p_Args[1])));
         }
 
         protected void BobbyReset(CommandHandler p_Handler, string[] p_Args, string p_Query)
         {
-            Bobby.m_Instance.ReleaseAll();
-            Bobby.m_Instance.StopCurrentAnims();
-            Bobby.m_Instance.m_EnableRandomMoves = false;
+            Bobby.BobbyApi.ReleaseStolenObjects();
+            Bobby.BobbyApi.StopBobbyMovements();
+            
         }
 
         protected void BobbyColor(CommandHandler p_Handler, string[] p_Args, string p_Query)
         {
-            Bobby.m_Instance.SetColor(CommandHandlerUtils.ParseColor(p_Args[1]));
+            Bobby.BobbyApi.SetColor(CommandHandlerUtils.ParseColor(p_Args[1]));
         }
 
         protected void CreateBobby(CommandHandler p_Handler, string[] p_Args, string p_Query)
         {
-            if (Bobby.m_Instance != null) return;
-            new GameObject("Bobby").AddComponent<Bobby>();
+            return;
         }
 
         protected void KillBobby(CommandHandler p_Handler, string[] p_Args, string p_Query)
         {
-            if (Bobby.m_Instance == null) return;
+            /*if (Bobby.m_Instance == null) return;
             Bobby.m_Instance.StopAllCoroutines();
             Bobby.m_Instance.StopCurrentAnims();
             Bobby.m_Instance.ReleaseAll();
-            GameObject.DestroyImmediate(GameObject.Find("Bobby"));
+            GameObject.DestroyImmediate(GameObject.Find("Bobby"));*/
+            return;
         }
 
         protected void SongTime(CommandHandler p_Handler, string[] p_Args, string p_Query)

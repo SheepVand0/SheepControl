@@ -28,8 +28,8 @@ namespace SheepControl.UI.CustomComponents
         {
             (m_TextInput = GSTextInput.Make("Name"))
                 .OnValueChanged(OnChange)
-                .BuildUI(Element.LElement.transform);
-            (m_RemoveButton = GSSecondaryButton.Make("x", 5, 5, p_OnClick: OnRemove)).BuildUI(Element.LElement.transform);
+                .BuildUI(Element.transform);
+            (m_RemoveButton = GSSecondaryButton.Make("x", 5, 5, p_OnClick: OnRemove)).BuildUI(Element.transform);
             SetWidth(100);
         }
 
@@ -51,6 +51,7 @@ namespace SheepControl.UI.CustomComponents
         private void OnRemove()
         {
             SConfig.Instance.BannedQueries.Remove(m_Name);
+            SConfig.Instance.Save();
             MainSettingsViewController.Instance.UpdateBannedQueries();
         }
 
